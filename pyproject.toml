@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "odeanalysis"
+version = "0.1.0"
+description = "Symbolic formal and structural analysis of ODEs and differential systems"
+requires-python = ">=3.11"
+dependencies = ["sympy>=1.12", "funcprops>=0.3.0", "semialg>=1.3.0"]
+readme = "README.md"
+license = "GPL-3.0-only"
+authors = [{name = "Bhuvanesh Bhatt", email = "bhuvaneshbhatt@gmail.com"}]
+keywords = ["ordinary differential equations", "symbolic computation", "asymptotics", "singularities", "monodromy", "Stokes phenomena"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Homepage = "https://github.com/BhuvaneshBhatt/odeanalysis"
+Documentation = "https://github.com/BhuvaneshBhatt/odeanalysis/tree/main/docs"
+Repository = "https://github.com/BhuvaneshBhatt/odeanalysis"
+Issues = "https://github.com/BhuvaneshBhatt/odeanalysis/issues"
+
+[project.optional-dependencies]
+test = ["pytest>=8", "hypothesis>=6"]
+asymptotic = ["asymptotic>=0.2.0"]
+certified = ["python-flint>=0.9.0"]
+dev = ["build>=1.2", "ruff>=0.16", "twine>=6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+odeanalysis = ["py.typed"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "-q -p no:ddtrace"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = ["dist", "build"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP", "RUF"]
+
+[tool.ruff.format]
+docstring-code-format = true
