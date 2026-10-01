@@ -129,9 +129,7 @@ def test_uniformizers_reject_wrong_turning_point_multiplicity():
         except ValueError:
             pass
         else:
-            raise AssertionError(
-                "uniformizer should enforce turning-point multiplicity"
-            )
+            raise AssertionError("uniformizer should enforce turning-point multiplicity")
 
 
 def test_uniform_reduction_verifier_rejects_corrupted_residual():

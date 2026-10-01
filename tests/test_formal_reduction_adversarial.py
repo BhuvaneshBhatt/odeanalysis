@@ -10,9 +10,7 @@ x = sp.symbols("x")
 def test_adaptive_search_preserves_verified_information_and_records_budget():
     system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
     bounded = formal_system_analysis(system, max_depth=1, adaptive=False)
-    adaptive = formal_system_analysis(
-        system, max_depth=1, adaptive=True, max_adaptive_depth=4
-    )
+    adaptive = formal_system_analysis(system, max_depth=1, adaptive=True, max_adaptive_depth=4)
     assert bounded.certificate.verified
     assert adaptive.certificate.verified
     assert adaptive.certificate.attempted_depths[0] == 1
@@ -22,9 +20,7 @@ def test_adaptive_search_preserves_verified_information_and_records_budget():
 
 
 def test_complete_claim_satisfies_independent_reduced_block_criterion():
-    system = FirstOrderSystem(
-        x, sp.ImmutableMatrix.diag(2 * x**-3 + x**-1, -(x**-3) + 3 * x**-1)
-    )
+    system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(2 * x**-3 + x**-1, -(x**-3) + 3 * x**-1))
     result = formal_system_analysis(system, adaptive=True, max_adaptive_depth=6)
     assert result.certificate.verified
     assert result.complete
@@ -73,10 +69,7 @@ def test_ramification_metadata_composes_exactly():
     system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
     twice = system.ramify(t, 2).ramify(u, 3)
     assert twice.ramification_index == 6
-    assert (
-        twice.matrix
-        == system.change_variable(u, u**6, ramification_multiplier=6).matrix
-    )
+    assert twice.matrix == system.change_variable(u, u**6, ramification_multiplier=6).matrix
 
 
 def test_formal_diagonalization_verifier_rejects_corrupt_partition_metadata():

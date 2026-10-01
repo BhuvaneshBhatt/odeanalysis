@@ -40,9 +40,7 @@ The reported Poincare rank is the rank of the supplied connection presentation. 
 ```python
 from odeanalysis import formal_system_analysis
 
-irregular = FirstOrderSystem(
-    x, sp.ImmutableMatrix([[1 / x**2, 0], [0, -1 / x**2]])
-)
+irregular = FirstOrderSystem(x, sp.ImmutableMatrix([[1 / x**2, 0], [0, -1 / x**2]]))
 formal = formal_system_analysis(irregular, max_power=2)
 assert formal.complete
 assert formal.verify()
@@ -75,7 +73,7 @@ This separation mirrors the scalar API: formal ray/support geometry and analytic
 
 ```python
 a = sp.symbols("a", real=True)
-family = FirstOrderSystem(x, sp.ImmutableMatrix([[a/x, 0], [0, -a/x]]))
+family = FirstOrderSystem(x, sp.ImmutableMatrix([[a / x, 0], [0, -a / x]]))
 parameter_data = system_parameter_analysis(family, (a,), max_resonance_order=4)
 assert parameter_data.exhaustive
 ```

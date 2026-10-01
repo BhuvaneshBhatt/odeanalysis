@@ -38,13 +38,8 @@ def test_abel_identity_and_explicit_basis_independence():
     y = sp.Function("y")
     ode = sp.diff(y(x), x, 2) + sp.diff(y(x), x) / x
     factor = abel_wronskian(ode, y, x)
-    assert (
-        sp.simplify(sp.diff(sp.log(factor / sp.Symbol("C_W", nonzero=True)), x) + 1 / x)
-        == 0
-    )
-    explicit = wronskian_analysis(
-        ode, y, x, basis=(1, sp.log(x)), assumptions=sp.Q.positive(x)
-    )
+    assert sp.simplify(sp.diff(sp.log(factor / sp.Symbol("C_W", nonzero=True)), x) + 1 / x) == 0
+    explicit = wronskian_analysis(ode, y, x, basis=(1, sp.log(x)), assumptions=sp.Q.positive(x))
     assert sp.simplify(explicit.wronskian - 1 / x) == 0
     assert explicit.independent is True
 

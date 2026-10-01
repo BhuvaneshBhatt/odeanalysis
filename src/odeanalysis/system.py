@@ -23,9 +23,7 @@ if TYPE_CHECKING:
     from .formal import CompleteFormalExponentialPart
 
 
-def _immutable_column(
-    vector: sp.MatrixBase | Sequence[sp.Expr], size: int
-) -> sp.ImmutableMatrix:
+def _immutable_column(vector: sp.MatrixBase | Sequence[sp.Expr], size: int) -> sp.ImmutableMatrix:
     matrix = sp.Matrix(vector)
     if matrix.shape == (size,):
         matrix = matrix.reshape(size, 1)
@@ -74,9 +72,7 @@ class FirstOrderSystem:
         """Return the normalized forcing vector or report an internal invariant failure."""
 
         if self.forcing is None:
-            raise RuntimeError(
-                "FirstOrderSystem forcing was not normalized during construction"
-            )
+            raise RuntimeError("FirstOrderSystem forcing was not normalized during construction")
         return self.forcing
 
     @property
@@ -150,9 +146,7 @@ class FirstOrderSystem:
 
         gauge = sp.Matrix(gauge)
         if gauge.shape != self.matrix.shape:
-            raise ValueError(
-                "gauge matrix must have the same square shape as the system"
-            )
+            raise ValueError("gauge matrix must have the same square shape as the system")
         determinant = sp.cancel(sp.together(gauge.det()))
         determinant_status = exact_zero_status(determinant)
         # Gauge transformations live in a symbolic/meromorphic function field:
@@ -168,18 +162,13 @@ class FirstOrderSystem:
             raise ValueError("gauge matrix must be invertible") from exc
         gauge_derivative = gauge.diff(self.variable)
         transformed = (
-            gauge_inverse * sp.Matrix(self.matrix) * gauge
-            - gauge_inverse * gauge_derivative
+            gauge_inverse * sp.Matrix(self.matrix) * gauge - gauge_inverse * gauge_derivative
         )
         forcing = gauge_inverse * sp.Matrix(self._forcing())
         return FirstOrderSystem(
             self.variable,
-            sp.ImmutableMatrix(
-                transformed.applyfunc(lambda entry: sp.cancel(sp.together(entry)))
-            ),
-            sp.ImmutableMatrix(
-                forcing.applyfunc(lambda entry: sp.cancel(sp.together(entry)))
-            ),
+            sp.ImmutableMatrix(transformed.applyfunc(lambda entry: sp.cancel(sp.together(entry)))),
+            sp.ImmutableMatrix(forcing.applyfunc(lambda entry: sp.cancel(sp.together(entry)))),
             self.ramification_index,
         )
 
@@ -197,9 +186,7 @@ class FirstOrderSystem:
         forcing = sp.Matrix(self._forcing()) * sp.exp(-exponent)
         return FirstOrderSystem(
             self.variable,
-            sp.ImmutableMatrix(
-                matrix.applyfunc(lambda entry: sp.cancel(sp.together(entry)))
-            ),
+            sp.ImmutableMatrix(matrix.applyfunc(lambda entry: sp.cancel(sp.together(entry)))),
             sp.ImmutableMatrix(forcing),
             self.ramification_index,
         )
@@ -217,9 +204,7 @@ class FirstOrderSystem:
         n = op.order
         lead = op.leading_coefficient
         if not normalize and sp.simplify(lead - 1) != 0:
-            coefficients = tuple(
-                sp.cancel(sp.together(c / lead)) for c in op.coefficients
-            )
+            coefficients = tuple(sp.cancel(sp.together(c / lead)) for c in op.coefficients)
             inhomogeneous = sp.cancel(sp.together(op.inhomogeneous / lead))
         else:
             coefficients = op.coefficients
@@ -252,9 +237,7 @@ def companion_system(
         operator = ode
     else:
         if function is None or variable is None:
-            raise TypeError(
-                "function and variable are required when ode is not an operator"
-            )
+            raise TypeError("function and variable are required when ode is not an operator")
         operator = LinearDifferentialOperator.from_ode(ode, function, variable)
     return FirstOrderSystem.from_scalar_operator(operator)
 

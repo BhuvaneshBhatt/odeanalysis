@@ -48,9 +48,7 @@ def formal_gauge_transform(
         try:
             ginv = g.inv()
         except SYMBOLIC_FAILURES as exc:  # pragma: no cover
-            raise BlockDecompositionError(
-                "formal gauge is not Laurent-invertible"
-            ) from exc
+            raise BlockDecompositionError("formal gauge is not Laurent-invertible") from exc
         a = sp.Matrix(connection.to_matrix())
         transformed = ginv * a * g - ginv * g.diff(variable)
         expanded = sp.zeros(connection.rows)
@@ -71,9 +69,7 @@ def formal_gauge_transform(
                     raise BlockDecompositionError(
                         "could not Laurent-expand a general formal gauge transform"
                     ) from exc
-        return MatrixLaurentSeries.from_matrix(expanded, variable).truncate(
-            max_power=max_power
-        )
+        return MatrixLaurentSeries.from_matrix(expanded, variable).truncate(max_power=max_power)
     ag = connection.multiply(gauge, max_power=max_power)
     conjugated = inverse.multiply(ag, max_power=max_power)
     derivative = gauge.derivative(max_power=max_power)

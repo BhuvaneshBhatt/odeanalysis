@@ -141,11 +141,7 @@ def test_stokes_geometry_uses_secondary_completed_exponential_split():
     x = sp.symbols("x", positive=True)
     y = sp.Function("y")
     w0 = x**-3
-    ode = (
-        sp.diff(y(x), x, 2)
-        - 2 * w0 * sp.diff(y(x), x)
-        + (w0**2 - sp.diff(w0, x) - x**-3) * y(x)
-    )
+    ode = sp.diff(y(x), x, 2) - 2 * w0 * sp.diff(y(x), x) + (w0**2 - sp.diff(w0, x) - x**-3) * y(x)
 
     geometry = stokes_geometry(ode, y, x, point=0)
     assert geometry.common_ramification == 2
@@ -162,9 +158,7 @@ def test_stokes_geometry_validates_exact_projection_and_sector_partition():
     y = sp.Function("y")
     geometry = stokes_geometry(sp.diff(y(x), x, 2) - x * y(x), y, x, point=sp.oo)
     geometry.validate()
-    assert (
-        sp.simplify(sum(sector.width for sector in geometry.sectors) - 2 * sp.pi) == 0
-    )
+    assert sp.simplify(sum(sector.width for sector in geometry.sectors) - 2 * sp.pi) == 0
     assert all(
         set(sector.dominance_order) == set(range(len(geometry.exponential_parts)))
         for sector in geometry.sectors
@@ -217,9 +211,7 @@ def test_stokes_validator_rejects_inconsistent_global_rays_and_sector_metadata()
     y = sp.Function("y")
     geometry = stokes_geometry(sp.diff(y(x), x, 2) - x * y(x), y, x, point=sp.oo)
 
-    missing_ray = replace(
-        geometry, equal_magnitude_rays=geometry.equal_magnitude_rays[:-1]
-    )
+    missing_ray = replace(geometry, equal_magnitude_rays=geometry.equal_magnitude_rays[:-1])
     try:
         missing_ray.validate()
     except StokesGeometryError:

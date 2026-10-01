@@ -34,9 +34,7 @@ def _contains_zero(ball):
         ),
     ],
 )
-def test_certified_reference_transports_contain_exact_values(
-    matrix, start, end, expected
-):
+def test_certified_reference_transports_contain_exact_values(matrix, start, end, expected):
     result = certified_system_continuation(
         FirstOrderSystem(x, matrix), start, end, precision_bits=192
     )
@@ -46,9 +44,7 @@ def test_certified_reference_transports_contain_exact_values(
             # Arb's string parser is used only to recover the returned ball;
             # containment is then checked against a high-precision point ball.
             target = acb(str(sp.N(expected[i, j], 60)))
-            assert not (balls[i][j] - target).is_finite() or (
-                balls[i][j] - target
-            ).contains(0)
+            assert not (balls[i][j] - target).is_finite() or (balls[i][j] - target).contains(0)
 
 
 def test_reverse_transport_product_contains_identity():
@@ -71,15 +67,9 @@ def test_reverse_transport_product_contains_identity():
 
 def test_concatenation_product_contains_direct_transport():
     A = sp.ImmutableMatrix([[0, 1], [-2, -3]])
-    ab = _balls(
-        certified_system_continuation(FirstOrderSystem(x, A), 0, 1, precision_bits=192)
-    )
-    bc = _balls(
-        certified_system_continuation(FirstOrderSystem(x, A), 1, 2, precision_bits=192)
-    )
-    ac = _balls(
-        certified_system_continuation(FirstOrderSystem(x, A), 0, 2, precision_bits=192)
-    )
+    ab = _balls(certified_system_continuation(FirstOrderSystem(x, A), 0, 1, precision_bits=192))
+    bc = _balls(certified_system_continuation(FirstOrderSystem(x, A), 1, 2, precision_bits=192))
+    ac = _balls(certified_system_continuation(FirstOrderSystem(x, A), 0, 2, precision_bits=192))
     for i in range(2):
         for j in range(2):
             composed = sum(bc[i][k] * ab[k][j] for k in range(2))
@@ -90,9 +80,7 @@ def test_precision_contract_and_refusal_are_explicit():
     system = FirstOrderSystem(x, sp.ImmutableMatrix([[1]]))
     with pytest.raises(ValueError):
         certified_system_continuation(system, 0, 1, precision_bits=32)
-    variable = certified_system_continuation(
-        FirstOrderSystem(x, sp.ImmutableMatrix([[x]])), 0, 1
-    )
+    variable = certified_system_continuation(FirstOrderSystem(x, sp.ImmutableMatrix([[x]])), 0, 1)
     assert not variable.complete
     assert "variable-coefficient" in variable.limitation
 

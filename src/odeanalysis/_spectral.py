@@ -60,22 +60,15 @@ class SpectralSplitVerification:
             projector = sp.Matrix(projector_imm)
             if projector.shape != matrix.shape or int(projector.rank()) != dimension:
                 return False
-            if any(
-                sp.simplify(entry) != 0 for entry in projector * projector - projector
-            ):
+            if any(sp.simplify(entry) != 0 for entry in projector * projector - projector):
                 return False
-            if any(
-                sp.simplify(entry) != 0
-                for entry in matrix * projector - projector * matrix
-            ):
+            if any(sp.simplify(entry) != 0 for entry in matrix * projector - projector * matrix):
                 return False
             generalized = (matrix - value * identity) ** matrix.rows
             if any(sp.simplify(entry) != 0 for entry in generalized * projector):
                 return False
             for other in self.projectors[i + 1 :]:
-                if any(
-                    sp.simplify(entry) != 0 for entry in projector * sp.Matrix(other)
-                ):
+                if any(sp.simplify(entry) != 0 for entry in projector * sp.Matrix(other)):
                     return False
             total += projector
         return all(sp.simplify(entry) == 0 for entry in total - identity)
@@ -156,20 +149,14 @@ def generalized_eigenbasis(
 
     matrix = sp.Matrix(matrix)
     if matrix.rows != matrix.cols:
-        raise BlockDecompositionError(
-            "spectral splitting requires a square coefficient"
-        )
+        raise BlockDecompositionError("spectral splitting requires a square coefficient")
     n = matrix.rows
     try:
         eigenvalues = matrix.eigenvals()
     except SYMBOLIC_FAILURES as exc:  # pragma: no cover
-        raise BlockDecompositionError(
-            "could not compute exact leading eigenvalues"
-        ) from exc
+        raise BlockDecompositionError("could not compute exact leading eigenvalues") from exc
     if sum(int(mult) for mult in eigenvalues.values()) != n:
-        raise BlockDecompositionError(
-            "leading characteristic polynomial did not split completely"
-        )
+        raise BlockDecompositionError("leading characteristic polynomial did not split completely")
     ordered = sorted(eigenvalues.items(), key=lambda item: sp.default_sort_key(item[0]))
     if len(ordered) < 2:
         raise BlockDecompositionError("coefficient has no distinct spectral groups")
@@ -192,9 +179,7 @@ def generalized_eigenbasis(
 
     change = sp.Matrix.hstack(*columns)
     if change.rank() != n:
-        raise BlockDecompositionError(
-            "generalized eigenspaces did not form a full basis"
-        )
+        raise BlockDecompositionError("generalized eigenspaces did not form a full basis")
     inverse = change.inv()
     projectors: list[sp.ImmutableMatrix] = []
     offset = 0
@@ -203,9 +188,7 @@ def generalized_eigenbasis(
         for index in range(offset, offset + dimension):
             selector[index, index] = 1
         projector = change * selector * inverse
-        projectors.append(
-            sp.ImmutableMatrix(projector.applyfunc(lambda entry: sp.simplify(entry)))
-        )
+        projectors.append(sp.ImmutableMatrix(projector.applyfunc(lambda entry: sp.simplify(entry))))
         offset += dimension
     return (
         sp.ImmutableMatrix(change),

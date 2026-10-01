@@ -14,8 +14,7 @@ def test_assumptions_change_parameter_dependent_singularity_kind():
     ode = x**2 * sp.diff(y(x), x, 2) + a * sp.diff(y(x), x) + y(x)
     assert classify_ode_point(ode, y, x, 0).kind is ODESingularityKind.UNKNOWN
     assert (
-        classify_ode_point(ode, y, x, 0, assumptions=sp.Eq(a, 0)).kind
-        is ODESingularityKind.REGULAR
+        classify_ode_point(ode, y, x, 0, assumptions=sp.Eq(a, 0)).kind is ODESingularityKind.REGULAR
     )
     assert (
         classify_ode_point(ode, y, x, 0, assumptions=sp.Ne(a, 0)).kind
@@ -32,9 +31,7 @@ def test_parameterized_analysis_stratifies_coefficient_valuation():
     zero = result.select(sp.Eq(a, 0))
     nonzero = result.select(sp.Ne(a, 0))
     assert zero is not None and zero.singularity.kind is ODESingularityKind.REGULAR
-    assert (
-        nonzero is not None and nonzero.singularity.kind is ODESingularityKind.IRREGULAR
-    )
+    assert nonzero is not None and nonzero.singularity.kind is ODESingularityKind.IRREGULAR
 
 
 def test_quadratic_indicial_discriminant_gets_parameter_strata():

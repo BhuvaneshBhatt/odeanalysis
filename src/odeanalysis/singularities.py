@@ -63,14 +63,9 @@ class ODESingularityAnalysis:
     @property
     def singular_points(self) -> tuple[sp.Expr, ...]:
         points = tuple(
-            item.point
-            for item in self.finite
-            if item.kind is not ODESingularityKind.ORDINARY
+            item.point for item in self.finite if item.kind is not ODESingularityKind.ORDINARY
         )
-        if (
-            self.infinity is not None
-            and self.infinity.kind is not ODESingularityKind.ORDINARY
-        ):
+        if self.infinity is not None and self.infinity.kind is not ODESingularityKind.ORDINARY:
             points += (sp.oo,)
         return points
 
@@ -112,9 +107,7 @@ def _indicial_data(
         root_dict = sp.roots(poly, r)
         if root_dict:
             roots = tuple(
-                root
-                for root, multiplicity in root_dict.items()
-                for _ in range(multiplicity)
+                root for root, multiplicity in root_dict.items() for _ in range(multiplicity)
             )
     except SYMBOLIC_FAILURES:
         pass
@@ -160,10 +153,7 @@ def classify_ode_point(
         kind = ODESingularityKind.ORDINARY
     elif all(
         (value is not None and value <= order - j)
-        or (
-            value is None
-            and (_pole_order_upper_bound(normalized[j], x, point) or 0) <= order - j
-        )
+        or (value is None and (_pole_order_upper_bound(normalized[j], x, point) or 0) <= order - j)
         for j, value in enumerate(known)
     ):
         kind = ODESingularityKind.REGULAR
@@ -226,9 +216,7 @@ def analyze_ode_singularities(
         t = sp.Dummy("t", positive=True)
         u = sp.Function("_u")
         transformed_operator = operator.reciprocal_transform(u, t)
-        local = classify_ode_point(
-            transformed_operator, point=sp.S.Zero, assumptions=assumptions
-        )
+        local = classify_ode_point(transformed_operator, point=sp.S.Zero, assumptions=assumptions)
         infinity = ODESingularity(
             point=sp.oo,
             kind=local.kind,

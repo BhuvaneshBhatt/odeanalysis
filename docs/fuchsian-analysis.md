@@ -13,11 +13,7 @@ y = sp.Function("y")
 a = sp.Rational(1, 3)
 b = sp.Rational(1, 2)
 c = sp.Rational(2, 3)
-ode = (
-    x * (1 - x) * sp.diff(y(x), x, 2)
-    + (c - (a + b + 1) * x) * sp.diff(y(x), x)
-    - a * b * y(x)
-)
+ode = x * (1 - x) * sp.diff(y(x), x, 2) + (c - (a + b + 1) * x) * sp.diff(y(x), x) - a * b * y(x)
 
 scheme = riemann_scheme(ode, y, x)
 assert scheme.points == (0, 1, sp.oo)

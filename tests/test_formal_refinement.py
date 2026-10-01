@@ -40,20 +40,15 @@ def test_airy_complete_exponential_power_and_amplitude_series():
         -sp.Rational(2, 3) * x ** sp.Rational(3, 2),
     }
     assert all(p.algebraic_power == sp.Rational(1, 4) for p in parts)
-    assert all(
-        sp.simplify(p.algebraic_prefactor - x ** sp.Rational(-1, 4)) == 0 for p in parts
-    )
+    assert all(sp.simplify(p.algebraic_prefactor - x ** sp.Rational(-1, 4)) == 0 for p in parts)
 
     amplitudes = formal_amplitude_series(ode, y, x, point=sp.oo, terms=7)
-    by_sign = {
-        sp.signsimp(a.exponential_part.exponential_polynomial): a for a in amplitudes
-    }
+    by_sign = {sp.signsimp(a.exponential_part.exponential_polynomial): a for a in amplitudes}
     growing = next(
         a
         for a in amplitudes
         if sp.simplify(
-            a.exponential_part.exponential_polynomial
-            - sp.Rational(2, 3) * x ** sp.Rational(3, 2)
+            a.exponential_part.exponential_polynomial - sp.Rational(2, 3) * x ** sp.Rational(3, 2)
         )
         == 0
     )
@@ -61,8 +56,7 @@ def test_airy_complete_exponential_power_and_amplitude_series():
         a
         for a in amplitudes
         if sp.simplify(
-            a.exponential_part.exponential_polynomial
-            + sp.Rational(2, 3) * x ** sp.Rational(3, 2)
+            a.exponential_part.exponential_polynomial + sp.Rational(2, 3) * x ** sp.Rational(3, 2)
         )
         == 0
     )
@@ -87,11 +81,7 @@ def test_airy_complete_exponential_power_and_amplitude_series():
     assert (
         sp.simplify(
             growing.series
-            - (
-                1
-                + sp.Rational(5, 48) / x ** sp.Rational(3, 2)
-                + sp.Rational(385, 4608) / x**3
-            )
+            - (1 + sp.Rational(5, 48) / x ** sp.Rational(3, 2) + sp.Rational(385, 4608) / x**3)
         )
         == 0
     )
@@ -116,10 +106,7 @@ def test_rank_one_equation_refines_to_exact_exponential_power_solution():
     expected = {x * sp.exp(1 / x), x * sp.exp(-1 / x)}
     assert {sp.simplify(s.expression) for s in solutions} == expected
     for solution in solutions:
-        assert (
-            sp.simplify(x**4 * sp.diff(solution.expression, x, 2) - solution.expression)
-            == 0
-        )
+        assert sp.simplify(x**4 * sp.diff(solution.expression, x, 2) - solution.expression) == 0
 
 
 def test_refinement_recovers_lower_exponential_terms_and_power_prefactor():
@@ -132,9 +119,7 @@ def test_refinement_recovers_lower_exponential_terms_and_power_prefactor():
     ode = sp.diff(y(x), x, 2) - potential * y(x)
 
     parts = complete_formal_exponential_parts(ode, y, x, point=0)
-    target = next(
-        p for p in parts if sp.simplify(p.exponential_polynomial - target_q) == 0
-    )
+    target = next(p for p in parts if sp.simplify(p.exponential_polynomial - target_q) == 0)
     assert target.algebraic_power == alpha
     assert sp.simplify(target.algebraic_prefactor - x**alpha) == 0
 
@@ -214,14 +199,9 @@ def test_sparse_laurent_basic_operations():
     b = SparseLaurentSeries.from_expr(2 / t - t, t)
 
     assert sp.expand(a.add(b).to_expr() - (1 / t**2 + 2 / t + 2 + 2 * t)) == 0
+    assert sp.expand(a.multiply(b).to_expr() - sp.expand(a.to_expr() * b.to_expr())) == 0
     assert (
-        sp.expand(a.multiply(b).to_expr() - sp.expand(a.to_expr() * b.to_expr())) == 0
-    )
-    assert (
-        sp.expand(
-            a.derivative(ramification_index=2).to_expr()
-            - sp.diff(a.to_expr(), t) / (2 * t)
-        )
+        sp.expand(a.derivative(ramification_index=2).to_expr() - sp.diff(a.to_expr(), t) / (2 * t))
         == 0
     )
     assert a.truncate(min_power=-1, max_power=0).to_expr() == 2
@@ -240,11 +220,7 @@ def test_recursive_secondary_riccati_newton_puiseux_refinement():
     # The original Newton edge therefore sees the repeated leading logarithmic
     # derivative x**(-3), while the two branches split only at x**(-3/2).
     w0 = x**-3
-    ode = (
-        sp.diff(y(x), x, 2)
-        - 2 * w0 * sp.diff(y(x), x)
-        + (w0**2 - sp.diff(w0, x) - x**-3) * y(x)
-    )
+    ode = sp.diff(y(x), x, 2) - 2 * w0 * sp.diff(y(x), x) + (w0**2 - sp.diff(w0, x) - x**-3) * y(x)
 
     leading = formal_exponential_parts(ode, y, x, point=0)
     assert len(leading) == 1
@@ -262,18 +238,14 @@ def test_recursive_secondary_riccati_newton_puiseux_refinement():
         -sp.Rational(1, 2) / x**2 - 2 / sp.sqrt(x),
         -sp.Rational(1, 2) / x**2 + 2 / sp.sqrt(x),
     }
-    assert {
-        sp.simplify(part.exponential_polynomial) for part in completed
-    } == expected_q
+    assert {sp.simplify(part.exponential_polynomial) for part in completed} == expected_q
 
     for part in completed:
         # The first secondary edge has only the zero root c^2; retaining it is
         # essential, because the actual split occurs later at local power -3/2.
         assert part.refinement_steps[0].coefficient == 0
         assert part.refinement_steps[0].root_multiplicity == 2
-        split = next(
-            step for step in part.refinement_steps if step.introduces_ramification
-        )
+        split = next(step for step in part.refinement_steps if step.introduces_ramification)
         assert split.local_power == -sp.Rational(3, 2)
         assert split.ramification_before == 1
         assert split.ramification_after == 2

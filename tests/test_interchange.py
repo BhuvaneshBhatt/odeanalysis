@@ -33,12 +33,7 @@ def test_interchange_mixed_irregular_repeated_block_is_isolated():
     a0 = (2 * x**2 - 3 * x + 2) / (x**6 * (x - 2))
     a1 = (2 * x**3 - 6 * x**2 - 5 * x + 2) / (x**4 * (x - 2))
     a2 = (4 * x**2 - 9 * x - 2) / (x**2 * (x - 2))
-    ode = (
-        sp.diff(y(x), x, 3)
-        + a2 * sp.diff(y(x), x, 2)
-        + a1 * sp.diff(y(x), x)
-        + a0 * y(x)
-    )
+    ode = sp.diff(y(x), x, 3) + a2 * sp.diff(y(x), x, 2) + a1 * sp.diff(y(x), x) + a0 * y(x)
 
     data = formal_ode_data(ode, y, x, point=0, terms=5, include_stokes=False)
     assert data.complete
@@ -89,13 +84,8 @@ def test_interchange_stokes_metadata_retains_original_plane_angles_and_sheets():
         sp.Rational(5, 3),
     }
     assert pair.equal_magnitude_sheets
-    assert all(
-        sector.original_representative_angle is not None
-        for sector in data.stokes.sectors
-    )
-    assert all(
-        sector.local_representative_angle is not None for sector in data.stokes.sectors
-    )
+    assert all(sector.original_representative_angle is not None for sector in data.stokes.sectors)
+    assert all(sector.local_representative_angle is not None for sector in data.stokes.sectors)
     assert all(sector.sheet is not None for sector in data.stokes.sectors)
 
 

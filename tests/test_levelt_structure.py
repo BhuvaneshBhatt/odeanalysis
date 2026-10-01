@@ -24,9 +24,7 @@ def test_moser_shearing_reduces_nilpotent_single_eigenvalue_irregular_block():
     assert step.eigenvalue == 0
     assert step.nilpotent_rank_before == 1
     assert step.exponents == (0, 1)
-    assert reduction.transformed_connection.to_matrix() == sp.Matrix(
-        [[0, 1 / t], [1 / t, -1 / t]]
-    )
+    assert reduction.transformed_connection.to_matrix() == sp.Matrix([[0, 1 / t], [1 / t, -1 / t]])
 
 
 def test_formal_block_diagonalizer_uses_moser_reducer_instead_of_stopping():
@@ -51,9 +49,7 @@ def test_regular_singular_levelt_reduction_splits_semisimple_and_nilpotent_resid
     assert reduction.semisimple_residue == sp.zeros(2)
     assert reduction.nilpotent_residue == sp.Matrix([[0, 1], [0, 0]])
     assert reduction.resonant_terms == ()
-    assert reduction.cover_monodromy_if_nonresonant == sp.Matrix(
-        [[1, 2 * sp.pi * sp.I], [0, 1]]
-    )
+    assert reduction.cover_monodromy_if_nonresonant == sp.Matrix([[1, 2 * sp.pi * sp.I], [0, 1]])
 
 
 def test_levelt_integer_transform_absorbs_positive_degree_resonance():

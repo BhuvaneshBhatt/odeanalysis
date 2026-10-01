@@ -231,19 +231,15 @@ class FormalODEGreenOperatorData:
         """Recompute and verify the stored operator invariants exactly."""
 
         lam = self.characteristic_parameter
-        expected = sp.expand(
-            sum(self.coefficients[k] * lam**k for k in range(self.order + 1))
-        )
+        expected = sp.expand(sum(self.coefficients[k] * lam**k for k in range(self.order + 1)))
         return (
             len(self.coefficients) == self.order + 1
             and expressions_equal(expected, self.characteristic_polynomial)
             and self.constant_coefficients
             == all(
-                self.variable not in coefficient.free_symbols
-                for coefficient in self.coefficients
+                self.variable not in coefficient.free_symbols for coefficient in self.coefficients
             )
-            and self.leading_coefficient_nonzero
-            == _nonzero_status(self.coefficients[-1])
+            and self.leading_coefficient_nonzero == _nonzero_status(self.coefficients[-1])
         )
 
 
@@ -263,9 +259,7 @@ def green_operator_data(
         raise TypeError("operator must be a LinearDifferentialOperator")
     coefficients = tuple(sp.simplify(c) for c in operator.coefficients)
     lam = sp.Symbol("__lambda")
-    characteristic = sp.expand(
-        sum(coefficients[k] * lam**k for k in range(operator.order + 1))
-    )
+    characteristic = sp.expand(sum(coefficients[k] * lam**k for k in range(operator.order + 1)))
     return FormalODEGreenOperatorData(
         variable=operator.variable,
         point=sp.sympify(point),
@@ -274,8 +268,7 @@ def green_operator_data(
         characteristic_parameter=lam,
         characteristic_polynomial=characteristic,
         constant_coefficients=all(
-            operator.variable not in coefficient.free_symbols
-            for coefficient in coefficients
+            operator.variable not in coefficient.free_symbols for coefficient in coefficients
         ),
         leading_coefficient_nonzero=_nonzero_status(coefficients[-1]),
     )
@@ -380,14 +373,12 @@ def _convert_stokes(
         first_h = geometry.exponential_parts[first.branch_indices[0]].local_coordinate
         for other in source_pairs[1:]:
             other_difference = other.difference_local_exponential_polynomial
-            other_h = geometry.exponential_parts[
-                other.branch_indices[0]
-            ].local_coordinate
+            other_h = geometry.exponential_parts[other.branch_indices[0]].local_coordinate
             if other_h != first_h:
                 other_difference = other_difference.xreplace({other_h: first_h})
-            if not expressions_equal(
-                first_difference, other_difference
-            ) and not expressions_equal(first_difference, -other_difference):
+            if not expressions_equal(first_difference, other_difference) and not expressions_equal(
+                first_difference, -other_difference
+            ):
                 raise StokesGeometryError(
                     "branch-level Stokes pairs in one exponential block pair disagree"
                 )
@@ -432,9 +423,7 @@ def _convert_stokes(
                     )
                 ),
                 equal_magnitude_sheets=tuple(
-                    ray.sheet
-                    for pair in source_pairs
-                    for ray in pair.equal_magnitude_rays
+                    ray.sheet for pair in source_pairs for ray in pair.equal_magnitude_rays
                 ),
                 phase_alignment_local_angles=_unique_expressions(
                     tuple(
@@ -451,9 +440,7 @@ def _convert_stokes(
                     )
                 ),
                 phase_alignment_sheets=tuple(
-                    ray.sheet
-                    for pair in source_pairs
-                    for ray in pair.phase_alignment_rays
+                    ray.sheet for pair in source_pairs for ray in pair.phase_alignment_rays
                 ),
                 source_branch_pairs=tuple(pair.branch_indices for pair in source_pairs),
             )
@@ -551,9 +538,7 @@ def formal_ode_data(
 
     limitation = structure.limitation
     stokes_data: FormalODEStokesData | None = None
-    distinct_q = {
-        sp.srepr(sp.expand(block.local_exponential_polynomial)) for block in blocks
-    }
+    distinct_q = {sp.srepr(sp.expand(block.local_exponential_polynomial)) for block in blocks}
     if include_stokes and structure.complete and len(distinct_q) >= 2:
         try:
             geometry = stokes_geometry(
@@ -568,9 +553,7 @@ def formal_ode_data(
             stokes_note = f"Stokes geometry unavailable: {exc}"
             limitation = f"{limitation}; {stokes_note}" if limitation else stokes_note
 
-    stokes_complete = (
-        stokes_data.sector_geometry_complete if stokes_data is not None else None
-    )
+    stokes_complete = stokes_data.sector_geometry_complete if stokes_data is not None else None
     provenance = FormalODEProvenance(
         reduction_path=(
             "scalar-operator",

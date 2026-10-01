@@ -49,9 +49,7 @@ def test_airy_at_infinity_has_two_ramified_exponential_blocks():
     assert structure.complete
     assert structure.ramification_index == 2
     assert tuple(block.dimension for block in structure.blocks) == (1, 1)
-    assert {
-        sp.simplify(block.exponential_polynomial) for block in structure.blocks
-    } == {
+    assert {sp.simplify(block.exponential_polynomial) for block in structure.blocks} == {
         -2 * x ** sp.Rational(3, 2) / 3,
         2 * x ** sp.Rational(3, 2) / 3,
     }

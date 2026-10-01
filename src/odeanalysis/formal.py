@@ -226,9 +226,7 @@ def differential_bell_laurent_series(
     if ramification_index < 1:
         raise ValueError("ramification_index must be positive")
 
-    bells: list[SparseLaurentSeries] = [
-        SparseLaurentSeries.one(logarithmic_derivative.variable)
-    ]
+    bells: list[SparseLaurentSeries] = [SparseLaurentSeries.one(logarithmic_derivative.variable)]
     for _ in range(order):
         derivative_part = bells[-1].derivative(
             ramification_index=ramification_index,
@@ -266,16 +264,12 @@ def riccati_expression(
         operator.order,
         derivative=derivative,
     )
-    return sp.expand(
-        sum(operator.coefficients[j] * bells[j] for j in range(operator.order + 1))
-    )
+    return sp.expand(sum(operator.coefficients[j] * bells[j] for j in range(operator.order + 1)))
 
 
 def _ramified_derivative(parameter: sp.Symbol, ramification: int):
     def derivative(expression: sp.Expr) -> sp.Expr:
-        return sp.diff(expression, parameter) / (
-            ramification * parameter ** (ramification - 1)
-        )
+        return sp.diff(expression, parameter) / (ramification * parameter ** (ramification - 1))
 
     derivative.parameter = parameter
     derivative.ramification_index = ramification
@@ -357,15 +351,11 @@ def _differential_perturbation_polynomial(
 
     order = len(coefficients) - 1
     if order < 1:
-        raise FormalRefinementError(
-            "secondary Riccati refinement requires positive order"
-        )
+        raise FormalRefinementError("secondary Riccati refinement requires positive order")
     z = sp.symbols(f"_z0:{order}")
 
     def derivative(expression: sp.Expr) -> sp.Expr:
-        result = sp.diff(expression, parameter) / (
-            ramification * parameter ** (ramification - 1)
-        )
+        result = sp.diff(expression, parameter) / (ramification * parameter ** (ramification - 1))
         for k in range(order - 1):
             result += sp.diff(expression, z[k]) * z[k + 1]
         return sp.expand(result)
@@ -398,9 +388,7 @@ def _riccati_newton_support(
         if coefficient == 0:
             continue
         try:
-            valuation, leading = local_order_and_leading_coefficient(
-                coefficient, parameter
-            )
+            valuation, leading = local_order_and_leading_coefficient(coefficient, parameter)
         except (ValueError, NotImplementedError) as exc:
             raise FormalRefinementError(
                 "could not determine a coefficient valuation in the secondary "
@@ -477,8 +465,7 @@ def _characteristic_roots_with_multiplicity(
 
     if sum(roots.values()) != degree:
         raise FormalRefinementError(
-            f"could not resolve all roots of secondary characteristic polynomial "
-            f"{polynomial!s}"
+            f"could not resolve all roots of secondary characteristic polynomial {polynomial!s}"
         )
     return tuple(sorted(roots.items(), key=lambda item: sp.default_sort_key(item[0])))
 
@@ -495,8 +482,7 @@ def _secondary_characteristic_at_power(
         for order, exponent in enumerate(item.monomial):
             if exponent:
                 derivative_factor *= (
-                    _falling_derivative_factor(parameter_power, ramification, order)
-                    ** exponent
+                    _falling_derivative_factor(parameter_power, ramification, order) ** exponent
                 )
         derivative_factor = sp.simplify(derivative_factor)
         if derivative_factor == 0:
@@ -542,12 +528,8 @@ def _next_secondary_balance(
         for right in support[index + 1 :]:
             if left.degree == right.degree:
                 continue
-            right_intercept = (
-                right.valuation - state.ramification * right.derivative_weight
-            )
-            power = sp.simplify(
-                (right_intercept - left_intercept) / (left.degree - right.degree)
-            )
+            right_intercept = right.valuation - state.ramification * right.derivative_weight
+            power = sp.simplify((right_intercept - left_intercept) / (left.degree - right.degree))
             if power.is_Rational is not True:
                 continue
             power = sp.Rational(power)
@@ -561,9 +543,7 @@ def _next_secondary_balance(
         )
         if not characteristic.has(characteristic_variable):
             continue
-        roots = _characteristic_roots_with_multiplicity(
-            characteristic, characteristic_variable
-        )
+        roots = _characteristic_roots_with_multiplicity(characteristic, characteristic_variable)
         if roots:
             return _SecondaryBalance(
                 parameter_power=power,
@@ -580,15 +560,11 @@ def _reramify_state(
     multiplier: int,
 ) -> tuple[_LogDerivativeState, tuple[sp.Expr, ...]]:
     if multiplier == 1:
-        coefficients, _ = _ramified_operator_data(
-            localized, state.parameter, state.ramification
-        )
+        coefficients, _ = _ramified_operator_data(localized, state.parameter, state.ramification)
         return state, coefficients
     new_parameter = sp.Dummy("t", positive=True)
     new_ramification = state.ramification * multiplier
-    new_expression = sp.expand(
-        state.expression.subs(state.parameter, new_parameter**multiplier)
-    )
+    new_expression = sp.expand(state.expression.subs(state.parameter, new_parameter**multiplier))
     new_coefficients_history = tuple(
         LogDerivativeCoefficient(item.power * multiplier, item.coefficient)
         for item in state.coefficients
@@ -602,9 +578,7 @@ def _reramify_state(
         search_floor=sp.Rational(state.search_floor * multiplier),
         refinement_steps=state.refinement_steps,
     )
-    coefficients, _ = _ramified_operator_data(
-        localized, new_parameter, new_ramification
-    )
+    coefficients, _ = _ramified_operator_data(localized, new_parameter, new_ramification)
     return reramified, coefficients
 
 
@@ -619,12 +593,8 @@ def _log_derivative_to_local(
         coefficient, power = term.as_coeff_exponent(parameter)
         power = sp.sympify(power)
         if not power.is_Integer:
-            raise FormalRefinementError(
-                "ramified logarithmic derivative has a noninteger t-power"
-            )
-        result += coefficient * local_coordinate ** (
-            sp.Rational(int(power), ramification)
-        )
+            raise FormalRefinementError("ramified logarithmic derivative has a noninteger t-power")
+        result += coefficient * local_coordinate ** (sp.Rational(int(power), ramification))
     return sp.simplify(result)
 
 
@@ -671,9 +641,7 @@ def _refine_one_leading_part(
             parameter=parameter,
             ramification=initial_ramification,
             expression=initial,
-            coefficients=(
-                LogDerivativeCoefficient(first_power, leading.characteristic_root),
-            ),
+            coefficients=(LogDerivativeCoefficient(first_power, leading.characteristic_root),),
             multiplicity=int(leading.multiplicity),
             search_floor=sp.Rational(first_power),
         )
@@ -686,9 +654,7 @@ def _refine_one_leading_part(
             finished.append(state)
             continue
 
-        coefficients, _ = _ramified_operator_data(
-            localized, state.parameter, state.ramification
-        )
+        coefficients, _ = _ramified_operator_data(localized, state.parameter, state.ramification)
         balance = _next_secondary_balance(coefficients, state)
         if balance is None:
             finished.append(state)
@@ -775,9 +741,7 @@ def _refine_one_leading_part(
         local_q, alpha = _integrated_exponential_and_power(
             state.coefficients, h, state.ramification
         )
-        local_w = _log_derivative_to_local(
-            state.expression, state.parameter, h, state.ramification
-        )
+        local_w = _log_derivative_to_local(state.expression, state.parameter, h, state.ramification)
         result.append(
             CompleteFormalExponentialPart(
                 leading_part=leading,
@@ -835,9 +799,7 @@ def complete_formal_exponential_parts(
     localized = localize_operator(ode, function, variable, point=point)
     result: list[CompleteFormalExponentialPart] = []
     for leading in formal_exponential_parts(ode, function, variable, point=point):
-        result.extend(
-            _refine_one_leading_part(localized, leading, max_branches=max_branches)
-        )
+        result.extend(_refine_one_leading_part(localized, leading, max_branches=max_branches))
     return tuple(result)
 
 
@@ -847,9 +809,7 @@ def _amplitude_conjugated_coefficients(
 ) -> tuple[tuple[sp.Expr, ...], callable]:
     parameter = completed.local_parameter
     ramification = completed.ramification_index
-    base_coefficients, derivative = _ramified_operator_data(
-        localized, parameter, ramification
-    )
+    base_coefficients, derivative = _ramified_operator_data(localized, parameter, ramification)
     try:
         logarithmic_series = SparseLaurentSeries.from_expr(
             completed.logarithmic_derivative_parameter, parameter
@@ -876,8 +836,7 @@ def _amplitude_conjugated_coefficients(
         transformed.append(
             sp.expand(
                 sum(
-                    base_coefficients[j] * sp.binomial(j, k) * bells[j - k]
-                    for j in range(k, n + 1)
+                    base_coefficients[j] * sp.binomial(j, k) * bells[j - k] for j in range(k, n + 1)
                 )
             )
         )
@@ -892,9 +851,7 @@ def _amplitude_residual(
     derivatives = [amplitude]
     for _ in range(1, len(transformed_coefficients)):
         derivatives.append(sp.expand(derivative(derivatives[-1])))
-    return sp.expand(
-        sum(c * derivatives[k] for k, c in enumerate(transformed_coefficients))
-    )
+    return sp.expand(sum(c * derivatives[k] for k, c in enumerate(transformed_coefficients)))
 
 
 def formal_amplitude_series(
@@ -928,9 +885,7 @@ def formal_amplitude_series(
 
     for branch_index, completed in enumerate(completed_parts):
         parameter = completed.local_parameter
-        transformed, derivative = _amplitude_conjugated_coefficients(
-            localized, completed
-        )
+        transformed, derivative = _amplitude_conjugated_coefficients(localized, completed)
         amplitude = sp.S.One
         values: list[sp.Expr] = [sp.S.One]
         for power in range(1, terms):
@@ -947,25 +902,18 @@ def formal_amplitude_series(
             amplitude = sp.expand(amplitude + value * parameter**power)
             values.append(value)
 
-        residual = sp.cancel(
-            sp.together(_amplitude_residual(transformed, amplitude, derivative))
-        )
+        residual = sp.cancel(sp.together(_amplitude_residual(transformed, amplitude, derivative)))
         if residual == 0:
             residual_valuation = None
         else:
             try:
-                residual_valuation, _ = local_order_and_leading_coefficient(
-                    residual, parameter
-                )
+                residual_valuation, _ = local_order_and_leading_coefficient(residual, parameter)
             except (ValueError, NotImplementedError):
                 residual_valuation = None
 
         h = completed.local_coordinate
         local_series = sp.expand(
-            sum(
-                values[k] * h ** sp.Rational(k, completed.ramification_index)
-                for k in range(terms)
-            )
+            sum(values[k] * h ** sp.Rational(k, completed.ramification_index) for k in range(terms))
         )
         x = localized.original_operator.variable
         if sp.sympify(point) == sp.oo:

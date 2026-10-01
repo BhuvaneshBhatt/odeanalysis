@@ -15,9 +15,7 @@ from .system import FirstOrderSystem
 from .turning import liouville_normal_form
 
 
-def _parameter_factors(
-    expression: sp.Expr, excluded: set[sp.Symbol]
-) -> tuple[sp.Expr, ...]:
+def _parameter_factors(expression: sp.Expr, excluded: set[sp.Symbol]) -> tuple[sp.Expr, ...]:
     expression = sp.factor(expression)
     factors = (
         sp.factor_list(expression)[1]
@@ -31,9 +29,7 @@ def _parameter_factors(
     return tuple(dict.fromkeys(result))
 
 
-def _polynomial_parameter_loci(
-    expression: sp.Expr, variable: sp.Symbol
-) -> tuple[sp.Expr, ...]:
+def _polynomial_parameter_loci(expression: sp.Expr, variable: sp.Symbol) -> tuple[sp.Expr, ...]:
     """Return loci where the effective degree or finite root multiplicities can change."""
     try:
         polynomial = sp.Poly(sp.expand(expression), variable)
@@ -42,9 +38,7 @@ def _polynomial_parameter_loci(
     loci: list[sp.Expr] = []
     # Every coefficient can become the leading coefficient on a lower-degree stratum.
     # Its vanishing therefore represents a projective root-at-infinity transition.
-    coefficients = [
-        sp.factor(polynomial.nth(k)) for k in range(polynomial.degree() + 1)
-    ]
+    coefficients = [sp.factor(polynomial.nth(k)) for k in range(polynomial.degree() + 1)]
     for coefficient in coefficients:
         loci.extend(_parameter_factors(coefficient, {variable}))
     # On each possible effective-degree stratum, the corresponding truncation's
@@ -53,15 +47,11 @@ def _polynomial_parameter_loci(
         truncated = sum(polynomial.nth(k) * variable**k for k in range(degree + 1))
         if polynomial.nth(degree) == 0:
             continue
-        loci.extend(
-            _parameter_factors(sp.discriminant(truncated, variable), {variable})
-        )
+        loci.extend(_parameter_factors(sp.discriminant(truncated, variable), {variable}))
     return tuple(dict.fromkeys(loci))
 
 
-def _effective_support_polynomials(
-    expression: sp.Expr, variable: sp.Symbol
-) -> tuple[sp.Poly, ...]:
+def _effective_support_polynomials(expression: sp.Expr, variable: sp.Symbol) -> tuple[sp.Poly, ...]:
     """Canonical numerator/denominator polynomials for rational support analysis."""
     numerator, denominator = sp.fraction(sp.cancel(expression))
     polynomials: list[sp.Poly] = []
@@ -126,17 +116,11 @@ def _projective_strata_from_polynomial(
             continue
         condition = sp.And(*higher_zero, sp.Ne(coefficient, 0, evaluate=False))
         if is_satisfiable(condition, parameters) is not False:
-            strata.append(
-                ProjectivePolynomialStratum(
-                    condition, degree, reference_degree - degree
-                )
-            )
+            strata.append(ProjectivePolynomialStratum(condition, degree, reference_degree - degree))
         higher_zero.append(sp.Eq(coefficient, 0, evaluate=False))
     zero_condition = sp.And(*higher_zero) if higher_zero else sp.false
     if is_satisfiable(zero_condition, parameters) is not False:
-        strata.append(
-            ProjectivePolynomialStratum(zero_condition, -1, reference_degree + 1)
-        )
+        strata.append(ProjectivePolynomialStratum(zero_condition, -1, reference_degree + 1))
     return tuple(strata)
 
 
@@ -296,7 +280,5 @@ def leading_rank_analysis(
         lambda entry: sp.simplify(sp.limit(entry.subs(x, point + h) / h**minimum, h, 0))
     )
     immutable = sp.ImmutableMatrix(leading)
-    strata = matrix_rank_stratification(
-        immutable, parameters, parameter_domain=parameter_domain
-    )
+    strata = matrix_rank_stratification(immutable, parameters, parameter_domain=parameter_domain)
     return LeadingMatrixRankAnalysis(-minimum, immutable, strata)

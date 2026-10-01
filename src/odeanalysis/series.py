@@ -98,9 +98,7 @@ class SparseLaurentSeries:
         return dict(self.terms)
 
     def to_expr(self) -> sp.Expr:
-        return sp.Add(
-            *(coefficient * self.variable**power for power, coefficient in self.terms)
-        )
+        return sp.Add(*(coefficient * self.variable**power for power, coefficient in self.terms))
 
     def truncate(
         self,
@@ -162,8 +160,7 @@ class SparseLaurentSeries:
                 if max_power is not None and power > max_power:
                     continue
                 coefficients[power] = (
-                    coefficients.get(power, sp.S.Zero)
-                    + left_coefficient * right_coefficient
+                    coefficients.get(power, sp.S.Zero) + left_coefficient * right_coefficient
                 )
         return SparseLaurentSeries.from_mapping(self.variable, coefficients)
 

@@ -64,7 +64,7 @@ from odeanalysis import analyze_ode_singularities, frobenius_analysis
 
 x = sp.symbols("x")
 y = sp.Function("y")
-ode = x**2*sp.diff(y(x), x, 2) + x*sp.diff(y(x), x) + (x**2-1)*y(x)
+ode = x**2 * sp.diff(y(x), x, 2) + x * sp.diff(y(x), x) + (x**2 - 1) * y(x)
 
 singularities = analyze_ode_singularities(ode, y, x)
 frobenius = frobenius_analysis(ode, y, x, point=0, terms=6)
@@ -80,10 +80,15 @@ Continue with [local analysis](./docs/local-analysis.md),
 
 ```python
 import sympy as sp
-from odeanalysis import FirstOrderSystem, analyze_system_singularity, formal_system_analysis, system_stokes_geometry
+from odeanalysis import (
+    FirstOrderSystem,
+    analyze_system_singularity,
+    formal_system_analysis,
+    system_stokes_geometry,
+)
 
 x = sp.symbols("x")
-system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -x**-2))
+system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
 local = analyze_system_singularity(system, 0)
 formal = formal_system_analysis(system, 0, adaptive=True)
 stokes = system_stokes_geometry(formal)
@@ -102,7 +107,7 @@ and [parameter stratification](./docs/system-parameters.md). The overview remain
 from odeanalysis import system_formal_type_stratification
 
 a = sp.symbols("a", real=True)
-family = FirstOrderSystem(x, sp.ImmutableMatrix.diag(a/x, -a/x))
+family = FirstOrderSystem(x, sp.ImmutableMatrix.diag(a / x, -a / x))
 strata = system_formal_type_stratification(family, (a,), max_resonance_order=2)
 ```
 

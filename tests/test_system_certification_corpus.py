@@ -140,9 +140,7 @@ def test_system_reference_corpus(case: Case):
     assert result.exponents == case.exponents
     assert result.leading_rank == case.leading_rank
     if case.formal_complete is not None:
-        formal = formal_system_analysis(
-            FirstOrderSystem(x, case.matrix), case.point, adaptive=True
-        )
+        formal = formal_system_analysis(FirstOrderSystem(x, case.matrix), case.point, adaptive=True)
         assert formal.verify()
         assert formal.complete is case.formal_complete
         assert formal.ramification_index == case.ramification
@@ -152,9 +150,7 @@ def test_resonance_corpus_distinguishes_repetition_from_nonzero_integer_shift():
     repeated = analyze_system_singularity(
         FirstOrderSystem(x, sp.ImmutableMatrix.diag(1 / x, 1 / x))
     )
-    shifted = analyze_system_singularity(
-        FirstOrderSystem(x, sp.ImmutableMatrix.diag(1 / x, 4 / x))
-    )
+    shifted = analyze_system_singularity(FirstOrderSystem(x, sp.ImmutableMatrix.diag(1 / x, 4 / x)))
     assert repeated.resonances == ()
     assert len(shifted.resonances) == 1
     assert abs(shifted.resonances[0].difference) == 3

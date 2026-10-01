@@ -40,9 +40,7 @@ def test_production_definitions_are_not_overridden_in_one_scope():
         for node in body:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 if node.name in seen:
-                    hits.append(
-                        f"{path.name}:{scope}:{node.name}:{seen[node.name]},{node.lineno}"
-                    )
+                    hits.append(f"{path.name}:{scope}:{node.name}:{seen[node.name]},{node.lineno}")
                 seen[node.name] = node.lineno
         for node in body:
             if isinstance(node, ast.ClassDef):
@@ -103,9 +101,7 @@ def test_package_docstring_and_public_api_are_declared_coherently():
     init_path = SRC / "__init__.py"
     tree = ast.parse(init_path.read_text())
     docstring = ast.get_docstring(tree) or ""
-    assert docstring.startswith(
-        "Primary public API for symbolic structural ODE analysis."
-    )
+    assert docstring.startswith("Primary public API for symbolic structural ODE analysis.")
     assert "api-classification.md" in docstring
     all_assignments = [
         node
@@ -113,8 +109,7 @@ def test_package_docstring_and_public_api_are_declared_coherently():
         if (
             isinstance(node, ast.Assign)
             and any(
-                isinstance(target, ast.Name) and target.id == "__all__"
-                for target in node.targets
+                isinstance(target, ast.Name) and target.id == "__all__" for target in node.targets
             )
         )
         or (

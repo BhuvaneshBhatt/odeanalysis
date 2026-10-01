@@ -34,10 +34,7 @@ def test_rank_one_irregular_newton_polygon_and_exponential_parts():
     assert len(parts) == 2
     assert {sp.simplify(part.exponent) for part in parts} == {1 / x, -1 / x}
     assert all(
-        sp.expand(
-            part.characteristic_polynomial - (part.characteristic_variable**2 - 1)
-        )
-        == 0
+        sp.expand(part.characteristic_polynomial - (part.characteristic_variable**2 - 1)) == 0
         for part in parts
     )
 
@@ -91,9 +88,7 @@ def test_collinear_terms_all_contribute_to_edge_characteristic_polynomial():
     lam = sp.symbols("lam")
     assert edge.slope == 1
     assert tuple(p.derivative_order for p in edge.points) == (0, 1, 2)
-    assert (
-        sp.expand(edge.characteristic_polynomial(lam) - (1 + 3 * lam + 2 * lam**2)) == 0
-    )
+    assert sp.expand(edge.characteristic_polynomial(lam) - (1 + 3 * lam + 2 * lam**2)) == 0
 
 
 def test_wkb_ansatz_includes_exact_exponential_gauge_transform():
@@ -117,9 +112,7 @@ def test_newton_polygon_is_invariant_under_scalar_operator_multiple():
     ode2 = x**7 * ode1
     p1 = differential_newton_polygon(ode1, y, x, point=0)
     p2 = differential_newton_polygon(ode2, y, x, point=0)
-    assert tuple(edge.slope for edge in p1.edges) == tuple(
-        edge.slope for edge in p2.edges
-    )
+    assert tuple(edge.slope for edge in p1.edges) == tuple(edge.slope for edge in p2.edges)
     assert p1.katz_rank == p2.katz_rank
     assert p1.irregularity == p2.irregularity
 

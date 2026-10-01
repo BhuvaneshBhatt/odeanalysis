@@ -92,9 +92,7 @@ def test_stokes_transition_equations_are_invariant_under_common_exponential_shif
     a = sp.symbols("a", real=True)
     system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
     left = system_parameter_analysis(system, (a,), exponential_parts=(a / x, -a / x))
-    right = system_parameter_analysis(
-        system, (a,), exponential_parts=((a + 3) / x, (3 - a) / x)
-    )
+    right = system_parameter_analysis(system, (a,), exponential_parts=((a + 3) / x, (3 - a) / x))
 
     def monic_set(items):
         out = set()
@@ -114,7 +112,5 @@ def test_irregular_parameter_formal_types_are_representative_not_overcertified()
     assert any(s.signature.singularity_kind == "irregular" for s in result.strata)
     assert not result.exhaustive
     assert all(
-        not s.certified
-        for s in result.strata
-        if s.signature.singularity_kind == "irregular"
+        not s.certified for s in result.strata if s.signature.singularity_kind == "irregular"
     )

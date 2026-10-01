@@ -47,9 +47,7 @@ class ParameterizedLocalAnalysis:
         query = normalize_assumptions(sp.And(self.assumptions, assumptions))
         parameters = tuple(sorted(query.free_symbols, key=sp.default_sort_key))
         matches = [
-            stratum
-            for stratum in self.strata
-            if implies(query, stratum.condition, parameters)
+            stratum for stratum in self.strata if implies(query, stratum.condition, parameters)
         ]
         return matches[0] if len(matches) == 1 else None
 
@@ -64,9 +62,7 @@ def _local_operator(
     return operator.reciprocal_transform(u, t), sp.S.Zero
 
 
-def _valuation_atoms(
-    operator: LinearDifferentialOperator, point: sp.Expr
-) -> tuple[sp.Expr, ...]:
+def _valuation_atoms(operator: LinearDifferentialOperator, point: sp.Expr) -> tuple[sp.Expr, ...]:
     """Return parameter expressions whose vanishing can change pole orders."""
     op, local_point = _local_operator(operator, point)
     x = op.variable
@@ -78,9 +74,7 @@ def _valuation_atoms(
             local = sp.cancel(sp.together(coeff.subs(x, local_point + h)))
             num, den = sp.fraction(local)
             den_poly = sp.Poly(den, h)
-            den_val = next(
-                (k for k in range(den_poly.degree() + 1) if den_poly.nth(k) != 0), 0
-            )
+            den_val = next((k for k in range(den_poly.degree() + 1) if den_poly.nth(k) != 0), 0)
             # A cancellation matters to ordinary/regular/irregular classification
             # only when the generic denominator order exceeds the Fuchs bound.
             if den_val <= op.order - j:
@@ -111,11 +105,7 @@ def _indicial_atoms(
     op, local_point = _local_operator(operator, point)
     local = classify_ode_point(op, point=local_point, assumptions=assumptions)
     poly = local.indicial_polynomial
-    if (
-        local.kind is not ODESingularityKind.REGULAR
-        or poly is None
-        or operator.order != 2
-    ):
+    if local.kind is not ODESingularityKind.REGULAR or poly is None or operator.order != 2:
         return ()
     r = sp.Symbol("r")
     try:
@@ -165,9 +155,7 @@ def _parameter_cases(
         )
     )
     if not parameters:
-        cases = (
-            (_ParameterCase(sp.S.true, ()),) if is_satisfiable(assumptions, ()) else ()
-        )
+        cases = (_ParameterCase(sp.S.true, ()),) if is_satisfiable(assumptions, ()) else ()
         return cases, True
 
     marker = (
@@ -189,9 +177,7 @@ def _parameter_cases(
             continue
         signature = _transition_signature(premise, transition_polynomials, parameters)
         groups.setdefault(signature, []).append(case.condition)
-    cases = tuple(
-        _ParameterCase(sp.Or(*cells), signature) for signature, cells in groups.items()
-    )
+    cases = tuple(_ParameterCase(sp.Or(*cells), signature) for signature, cells in groups.items())
     # A complete semialg result already certifies coverage of the supplied
     # parameter domain; re-proving the disjunction with equivalent() is both
     # redundant and substantially more expensive on larger decompositions.
@@ -220,16 +206,12 @@ class _LocalContext:
     display_point: sp.Expr
 
     @classmethod
-    def build(
-        cls, operator: LinearDifferentialOperator, point: sp.Expr
-    ) -> _LocalContext:
+    def build(cls, operator: LinearDifferentialOperator, point: sp.Expr) -> _LocalContext:
         local_operator, local_point = _local_operator(operator, point)
         return cls(local_operator, local_point, point)
 
     def classify(self, assumptions: sp.Expr) -> ODESingularity:
-        local = classify_ode_point(
-            self.operator, point=self.point, assumptions=assumptions
-        )
+        local = classify_ode_point(self.operator, point=self.point, assumptions=assumptions)
         if self.display_point != sp.oo:
             return local
         return ODESingularity(
@@ -274,9 +256,7 @@ def _finite_resonance_strata(
             key=sp.default_sort_key,
         )
     )
-    equations = tuple(
-        sp.Eq(discriminant, n * n, evaluate=False) for n in range(1, max_order + 1)
-    )
+    equations = tuple(sp.Eq(discriminant, n * n, evaluate=False) for n in range(1, max_order + 1))
     strata = [
         ResonanceStratum(sp.And(assumptions, equation), n, True)
         for n, equation in enumerate(equations, 1)
@@ -285,10 +265,7 @@ def _finite_resonance_strata(
     if equations:
         complement = sp.And(
             assumptions,
-            *(
-                sp.Ne(discriminant, n * n, evaluate=False)
-                for n in range(1, max_order + 1)
-            ),
+            *(sp.Ne(discriminant, n * n, evaluate=False) for n in range(1, max_order + 1)),
         )
         if is_satisfiable(complement, parameters):
             strata.append(ResonanceStratum(complement, None, None))
@@ -318,9 +295,7 @@ def local_parameter_analysis(
         raise ValueError("max_resonance_order must be nonnegative")
     point = sp.sympify(point)
     atoms = _valuation_atoms(operator, point)
-    atoms += tuple(
-        a for a in _indicial_atoms(operator, point, assumptions) if a not in atoms
-    )
+    atoms += tuple(a for a in _indicial_atoms(operator, point, assumptions) if a not in atoms)
     # Resonance hypersurfaces are part of the same parameter geometry as
     # valuation and repeated-root transitions.
     op0, p0 = _local_operator(operator, point)
@@ -372,9 +347,7 @@ def local_parameter_analysis(
             continue
         a, b = (root for root, _ in f.root_multiplicities)
         resonance.append(sp.Contains(sp.simplify(a - b), sp.S.Integers))
-    resonance_strata = _finite_resonance_strata(
-        discriminant, assumptions, max_resonance_order
-    )
+    resonance_strata = _finite_resonance_strata(discriminant, assumptions, max_resonance_order)
 
     return ParameterizedLocalAnalysis(
         point=point,

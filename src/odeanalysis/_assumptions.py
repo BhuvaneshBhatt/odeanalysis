@@ -40,15 +40,11 @@ def zero_status(expr: sp.Expr, assumptions: sp.Expr | bool = True) -> bool | Non
     use_exprtest = _exprtest_zerotest is not None and not simplified.has(
         sp.nan, sp.zoo, sp.oo, -sp.oo
     )
-    if simplified.free_symbols and simplified.is_rational_function(
-        *simplified.free_symbols
-    ):
+    if simplified.free_symbols and simplified.is_rational_function(*simplified.free_symbols):
         use_exprtest = False
     if use_exprtest:
         try:
-            return _exprtest_zerotest(
-                simplified, assumptions=assumptions, confidence="certified"
-            )
+            return _exprtest_zerotest(simplified, assumptions=assumptions, confidence="certified")
         except (RecursionError, TypeError, ValueError):
             return None
     return None

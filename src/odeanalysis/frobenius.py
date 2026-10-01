@@ -60,15 +60,11 @@ class FrobeniusAnalysis:
 
     @property
     def roots(self) -> tuple[sp.Expr, ...]:
-        return tuple(
-            root for root, mult in self.root_multiplicities for _ in range(mult)
-        )
+        return tuple(root for root, mult in self.root_multiplicities for _ in range(mult))
 
     @property
     def has_resonance(self) -> bool:
-        return bool(self.resonances) or any(
-            mult > 1 for _, mult in self.root_multiplicities
-        )
+        return bool(self.resonances) or any(mult > 1 for _, mult in self.root_multiplicities)
 
     @property
     def logarithm_required(self) -> bool:
@@ -94,9 +90,7 @@ def _regularized_coefficients(
     )
 
 
-def _taylor_coeff(
-    expr: sp.Expr, variable: sp.Symbol, point: sp.Expr, k: int
-) -> sp.Expr:
+def _taylor_coeff(expr: sp.Expr, variable: sp.Symbol, point: sp.Expr, k: int) -> sp.Expr:
     if k == 0:
         return sp.simplify(sp.limit(expr, variable, point))
     deriv = sp.diff(expr, variable, k)
@@ -111,10 +105,7 @@ def _indicial_polynomial(
 ) -> sp.Expr:
     return sp.factor(
         sp.expand(
-            sum(
-                _taylor_coeff(bj, variable, point, 0) * sp.ff(r, j)
-                for j, bj in enumerate(b)
-            )
+            sum(_taylor_coeff(bj, variable, point, 0) * sp.ff(r, j) for j, bj in enumerate(b))
         )
     )
 
@@ -127,9 +118,7 @@ def _root_data(poly: sp.Expr, r: sp.Symbol) -> tuple[tuple[sp.Expr, int], ...]:
     except SYMBOLIC_FAILURES:
         roots = {}
     if roots:
-        return tuple(
-            sorted(roots.items(), key=lambda item: sp.default_sort_key(item[0]))
-        )
+        return tuple(sorted(roots.items(), key=lambda item: sp.default_sort_key(item[0])))
     try:
         p = sp.Poly(poly, r)
     except SYMBOLIC_FAILURES:
@@ -191,9 +180,7 @@ def _branch(
     assumptions: sp.Expr | bool = True,
 ) -> FrobeniusBranch:
     # b[j][q] is the q-th Taylor coefficient of h^(n-j) p_j.
-    bcoeff = [
-        tuple(_taylor_coeff(bj, variable, point, q) for q in range(terms)) for bj in b
-    ]
+    bcoeff = [tuple(_taylor_coeff(bj, variable, point, q) for q in range(terms)) for bj in b]
     coeffs: list[sp.Expr] = [sp.S.One]
     resonant: list[int] = []
     obstructed: list[int] = []
@@ -276,9 +263,7 @@ def frobenius_analysis(
         operator = ode
     else:
         if function is None or variable is None:
-            raise TypeError(
-                "function and variable are required when ode is not an operator"
-            )
+            raise TypeError("function and variable are required when ode is not an operator")
         operator = LinearDifferentialOperator.from_ode(ode, function, variable)
     if not operator.is_homogeneous:
         raise ValueError("Frobenius analysis requires a homogeneous equation")

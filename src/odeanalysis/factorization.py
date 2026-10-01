@@ -27,9 +27,7 @@ class FirstOrderFactorization:
         a = self.left_coefficient
         b = self.right_coefficient
         x = self.operator.variable
-        return (
-            sp.simplify(a + b - p) == 0 and sp.simplify(sp.diff(b, x) + a * b - q) == 0
-        )
+        return sp.simplify(a + b - p) == 0 and sp.simplify(sp.diff(b, x) + a * b - q) == 0
 
     @property
     def logarithmic_derivative(self) -> sp.Expr:

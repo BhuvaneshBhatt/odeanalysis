@@ -16,9 +16,7 @@ def _hypergeometric_equation():
     b = sp.Rational(1, 2)
     c = sp.Rational(2, 3)
     ode = (
-        x * (1 - x) * sp.diff(y(x), x, 2)
-        + (c - (a + b + 1) * x) * sp.diff(y(x), x)
-        - a * b * y(x)
+        x * (1 - x) * sp.diff(y(x), x, 2) + (c - (a + b + 1) * x) * sp.diff(y(x), x) - a * b * y(x)
     )
     return x, y, ode
 

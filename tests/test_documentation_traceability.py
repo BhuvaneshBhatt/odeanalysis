@@ -23,9 +23,7 @@ def _public_names():
 def test_every_root_public_name_is_in_api_reference():
     text = (DOCS / "api-reference.md").read_text()
     missing = [
-        name
-        for name in _public_names()
-        if name != "__version__" and f"`{name}`" not in text
+        name for name in _public_names() if name != "__version__" and f"`{name}`" not in text
     ]
     assert missing == []
 

@@ -78,9 +78,7 @@ def _matrix_pole_data(system: FirstOrderSystem) -> tuple[int, sp.ImmutableMatrix
     minimum = min(vals, default=0)
     pole = max(0, -minimum)
     scale = t**pole
-    leading = sp.Matrix(system.matrix).applyfunc(
-        lambda e: sp.simplify(sp.limit(scale * e, t, 0))
-    )
+    leading = sp.Matrix(system.matrix).applyfunc(lambda e: sp.simplify(sp.limit(scale * e, t, 0)))
     return pole, sp.ImmutableMatrix(leading)
 
 
@@ -274,9 +272,7 @@ def _rays(c: sp.Expr, k: int, phase: bool) -> tuple[sp.Expr, ...]:
         return ()
     arg = sp.arg(c)
     offset = 0 if phase else sp.pi / 2
-    return tuple(
-        sp.simplify((arg - offset - m * sp.pi) / k % (2 * sp.pi)) for m in range(2 * k)
-    )
+    return tuple(sp.simplify((arg - offset - m * sp.pi) / k % (2 * sp.pi)) for m in range(2 * k))
 
 
 def system_stokes_geometry(
@@ -324,9 +320,7 @@ class ParameterizedSystemAnalysis:
     exhaustive: bool
 
 
-def _parameter_factors(
-    expr: sp.Expr, parameters: tuple[sp.Symbol, ...]
-) -> list[sp.Expr]:
+def _parameter_factors(expr: sp.Expr, parameters: tuple[sp.Symbol, ...]) -> list[sp.Expr]:
     expr = sp.factor(expr)
     if expr == 0:
         return []
@@ -367,9 +361,7 @@ def system_parameter_analysis(
     minimum = min(structural_vals, default=0)
     pole = max(0, -minimum)
     leading = sp.ImmutableMatrix(
-        sp.Matrix(local.matrix).applyfunc(
-            lambda e: sp.cancel(sp.limit(t**pole * e, t, 0))
-        )
+        sp.Matrix(local.matrix).applyfunc(lambda e: sp.cancel(sp.limit(t**pole * e, t, 0)))
     )
     rank_loci: list[sp.Expr] = []
     collision_loci: list[sp.Expr] = []
@@ -381,9 +373,7 @@ def system_parameter_analysis(
         for rows in combinations(range(leading.rows), size):
             for cols in combinations(range(leading.cols), size):
                 rank_loci.extend(
-                    _parameter_factors(
-                        sp.Matrix(leading).extract(rows, cols).det(), parameters
-                    )
+                    _parameter_factors(sp.Matrix(leading).extract(rows, cols).det(), parameters)
                 )
     # Regular-singular eigenvalue collisions and, for 2x2 residues, exact
     # bounded integer-resonance hypersurfaces from the characteristic discriminant.
@@ -404,9 +394,7 @@ def system_parameter_analysis(
         if point == sp.oo:
             diff = sp.cancel(diff.subs(system.variable, 1 / local.variable))
         else:
-            diff = sp.cancel(
-                diff.subs(system.variable, sp.sympify(point) + local.variable)
-            )
+            diff = sp.cancel(diff.subs(system.variable, sp.sympify(point) + local.variable))
         lead = _leading_monomial(diff, local.variable)
         if lead is None:
             continue
@@ -422,9 +410,7 @@ def system_parameter_analysis(
     block_loci = list(dict.fromkeys(block_loci))
     stokes_loci = list(dict.fromkeys(stokes_loci))
     loci = list(
-        dict.fromkeys(
-            [*rank_loci, *collision_loci, *resonance_loci, *block_loci, *stokes_loci]
-        )
+        dict.fromkeys([*rank_loci, *collision_loci, *resonance_loci, *block_loci, *stokes_loci])
     )
     marker = sp.Ne(sp.prod(loci), 0, evaluate=False) if loci else sp.S.true
     geometry = parametric_cad(
@@ -517,8 +503,7 @@ def _formal_type_signature(
             sorted(
                 abs(int(r.difference))
                 for r in singularity.resonances
-                if r.difference.is_Integer
-                and abs(int(r.difference)) <= max_resonance_order
+                if r.difference.is_Integer and abs(int(r.difference)) <= max_resonance_order
             )
         ),
         formal.ramification_index if formal.certificate.verified else None,
@@ -601,11 +586,7 @@ def system_formal_type_stratification(
         strata.append(
             SystemFormalTypeStratum(
                 case.condition,
-                tuple(
-                    sorted(
-                        sample.items(), key=lambda item: sp.default_sort_key(item[0])
-                    )
-                ),
+                tuple(sorted(sample.items(), key=lambda item: sp.default_sort_key(item[0]))),
                 signature,
                 cell_certified,
             )

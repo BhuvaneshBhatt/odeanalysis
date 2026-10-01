@@ -72,6 +72,4 @@ def test_completed_exponential_parts_match_levelt_exponential_blocks():
     assert {sp.simplify(part.exponential_polynomial) for part in parts} == {
         sp.simplify(block.exponential_polynomial) for block in structure.blocks
     }
-    assert (
-        max(part.ramification_index for part in parts) == structure.ramification_index
-    )
+    assert max(part.ramification_index for part in parts) == structure.ramification_index

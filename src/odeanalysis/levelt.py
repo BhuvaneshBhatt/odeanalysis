@@ -100,9 +100,7 @@ class RegularSingularLeveltReduction:
     def cover_monodromy(self) -> sp.ImmutableMatrix:
         """Formal monodromy on one full turn of the uniformizing variable."""
 
-        return sp.ImmutableMatrix(
-            (2 * sp.pi * sp.I * sp.Matrix(self.levelt_residue)).exp()
-        )
+        return sp.ImmutableMatrix((2 * sp.pi * sp.I * sp.Matrix(self.levelt_residue)).exp())
 
     @property
     def cover_monodromy_if_nonresonant(self) -> sp.ImmutableMatrix | None:
@@ -242,9 +240,7 @@ def _image_complement(matrix: sp.MatrixBase) -> tuple[tuple[int, ...], tuple[int
         if rank == matrix.rows:
             break
     if rank != matrix.rows:
-        raise LeveltReductionError(
-            "could not construct a complement to the homological image"
-        )
+        raise LeveltReductionError("could not construct a complement to the homological image")
     return image_pivots, tuple(complement)
 
 
@@ -267,9 +263,7 @@ def _homological_reduce_coefficient(
     try:
         solution = system.inv() * rhs
     except SYMBOLIC_FAILURES as exc:
-        raise LeveltReductionError(
-            "could not solve the Levelt homological decomposition"
-        ) from exc
+        raise LeveltReductionError("could not solve the Levelt homological decomposition") from exc
     h_vec = sp.zeros(size * size, 1)
     for position, domain_index in enumerate(image_pivots):
         h_vec[domain_index] = sp.simplify(solution[position])
@@ -343,15 +337,11 @@ def _integer_levelt_shifts(
                     "by MatrixLaurentSeries"
                 )
             if difference != 0:
-                raise LeveltReductionError(
-                    "could not certify an integer Levelt exponent shift"
-                )
+                raise LeveltReductionError("could not certify an integer Levelt exponent shift")
     return tuple(shifts)
 
 
-def _diagonal_integer_gauge(
-    variable: sp.Symbol, shifts: tuple[int, ...]
-) -> MatrixLaurentSeries:
+def _diagonal_integer_gauge(variable: sp.Symbol, shifts: tuple[int, ...]) -> MatrixLaurentSeries:
     matrix = sp.diag(*(variable**shift for shift in shifts))
     return MatrixLaurentSeries.from_matrix(matrix, variable)
 
@@ -399,20 +389,14 @@ def levelt_reduce_regular_singular(
     try:
         jordan_basis, _jordan = residue.jordan_form()
     except SYMBOLIC_FAILURES as exc:
-        raise LeveltReductionError(
-            "could not construct the exact residue Jordan form"
-        ) from exc
+        raise LeveltReductionError("could not construct the exact residue Jordan form") from exc
     if sp.simplify(jordan_basis.det()) == 0:
         raise LeveltReductionError("residue Jordan basis is singular")
 
     constant = _constant_series(variable, jordan_basis)
-    jordan_connection = _formal_gauge_transform(
-        connection, constant, max_power=max_power
-    )
+    jordan_connection = _formal_gauge_transform(connection, constant, max_power=max_power)
     jordan_residue = sp.Matrix(jordan_connection.coefficient(-1))
-    exponents = tuple(
-        sp.simplify(jordan_residue[i, i]) for i in range(jordan_residue.rows)
-    )
+    exponents = tuple(sp.simplify(jordan_residue[i, i]) for i in range(jordan_residue.rows))
     classes = _exponent_classes(exponents)
     shifts = _integer_levelt_shifts(exponents, classes)
     spread = max(shifts, default=0) - min(shifts, default=0)
@@ -422,9 +406,7 @@ def levelt_reduce_regular_singular(
     # power displacement between two matrix entries.
     pre_order = max_power + spread
     if pre_order != max_power:
-        jordan_connection = _formal_gauge_transform(
-            connection, constant, max_power=pre_order
-        )
+        jordan_connection = _formal_gauge_transform(connection, constant, max_power=pre_order)
     pre_current, pre_gauge, absorbed = _homological_normalize(
         jordan_connection, jordan_residue, max_power=pre_order
     )

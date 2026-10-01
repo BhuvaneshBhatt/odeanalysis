@@ -51,9 +51,7 @@ def _exact_acb(expr: sp.Expr):
 
     expr = sp.sympify(expr)
     if expr.free_symbols:
-        raise ValueError(
-            "certified continuation requires numeric endpoints and coefficients"
-        )
+        raise ValueError("certified continuation requires numeric endpoints and coefficients")
     if expr.is_Integer:
         return acb(int(expr))
     if expr.is_Rational:
@@ -134,10 +132,7 @@ def certified_system_continuation(
             delta = _exact_acb(end - start)
             matrix = acb_mat(
                 [
-                    [
-                        _exact_acb(system.matrix[i, j]) * delta
-                        for j in range(system.dimension)
-                    ]
+                    [_exact_acb(system.matrix[i, j]) * delta for j in range(system.dimension)]
                     for i in range(system.dimension)
                 ]
             )

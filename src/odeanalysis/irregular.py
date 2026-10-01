@@ -89,9 +89,7 @@ def _known_roots(
     except SYMBOLIC_FAILURES:
         roots = {}
     result = {
-        sp.simplify(root): int(mult)
-        for root, mult in roots.items()
-        if sp.simplify(root) != 0
+        sp.simplify(root): int(mult) for root, mult in roots.items() if sp.simplify(root) != 0
     }
     if sum(result.values()) != expected_mult:
         try:
@@ -164,9 +162,7 @@ def formal_exponential_parts(
 
     for edge in polygon.irregular_edges:
         characteristic = edge.characteristic_polynomial(lam)
-        for root, multiplicity in _known_roots(
-            characteristic, lam, edge.horizontal_length
-        ):
+        for root, multiplicity in _known_roots(characteristic, lam, edge.horizontal_length):
             rho = edge.slope
             sigma = rho + 1
             log_derivative = sp.simplify(root * h ** (-sigma))

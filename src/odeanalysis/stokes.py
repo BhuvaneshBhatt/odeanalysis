@@ -141,9 +141,7 @@ class StokesConnectionPattern:
             raise ValueError("Stokes connection pairs must be unique")
         for left, right in self.active_pairs:
             if left == right:
-                raise ValueError(
-                    "Stokes connection pairs must contain distinct branches"
-                )
+                raise ValueError("Stokes connection pairs must contain distinct branches")
             if not (0 <= left < self.dimension and 0 <= right < self.dimension):
                 raise ValueError("Stokes connection pair index is out of range")
 
@@ -167,9 +165,7 @@ class StokesConnectionPattern:
 
         matrix = sp.Matrix(matrix)
         if matrix.shape != (self.dimension, self.dimension):
-            raise StokesGeometryError(
-                "Stokes connection matrix has the wrong dimension"
-            )
+            raise StokesGeometryError("Stokes connection matrix has the wrong dimension")
         allowed = set(self.allowed_entries)
         for row in range(self.dimension):
             for col in range(self.dimension):
@@ -224,70 +220,41 @@ class StokesGeometry:
         if self.common_ramification < 1:
             raise StokesGeometryError("common ramification must be positive")
         branch_ids = set(range(len(self.exponential_parts)))
-        pair_equal_rays = tuple(
-            ray for pair in self.pairs for ray in pair.equal_magnitude_rays
-        )
-        pair_phase_rays = tuple(
-            ray for pair in self.pairs for ray in pair.phase_alignment_rays
-        )
+        pair_equal_rays = tuple(ray for pair in self.pairs for ray in pair.equal_magnitude_rays)
+        pair_phase_rays = tuple(ray for pair in self.pairs for ray in pair.phase_alignment_rays)
         if set(pair_equal_rays) != set(self.equal_magnitude_rays):
-            raise StokesGeometryError(
-                "global equal-magnitude rays disagree with pairwise geometry"
-            )
+            raise StokesGeometryError("global equal-magnitude rays disagree with pairwise geometry")
         if set(pair_phase_rays) != set(self.phase_alignment_rays):
-            raise StokesGeometryError(
-                "global phase-alignment rays disagree with pairwise geometry"
-            )
+            raise StokesGeometryError("global phase-alignment rays disagree with pairwise geometry")
         for pair in self.pairs:
             expected_pair = pair.branch_indices
             if pair.common_ramification != self.common_ramification:
-                raise StokesGeometryError(
-                    "pairwise and global Stokes ramifications disagree"
-                )
+                raise StokesGeometryError("pairwise and global Stokes ramifications disagree")
             if len(set(expected_pair)) != 2 or any(
                 index not in branch_ids for index in expected_pair
             ):
-                raise StokesGeometryError(
-                    "Stokes pair contains an invalid branch index"
-                )
+                raise StokesGeometryError("Stokes pair contains an invalid branch index")
             for ray in (*pair.equal_magnitude_rays, *pair.phase_alignment_rays):
                 if ray.pair != expected_pair:
-                    raise StokesGeometryError(
-                        "Stokes ray is attached to the wrong branch pair"
-                    )
-                expected_local = _normalize_angle(
-                    self.common_ramification * ray.cover_angle
-                )
+                    raise StokesGeometryError("Stokes ray is attached to the wrong branch pair")
+                expected_local = _normalize_angle(self.common_ramification * ray.cover_angle)
                 if sp.simplify(_normalize_angle(ray.local_angle) - expected_local) != 0:
-                    raise StokesGeometryError(
-                        "Stokes ray has an inconsistent local projection"
-                    )
+                    raise StokesGeometryError("Stokes ray has an inconsistent local projection")
                 expected_original = (
                     _normalize_angle(-expected_local)
                     if sp.sympify(self.point) == sp.oo
                     else expected_local
                 )
-                if (
-                    sp.simplify(
-                        _normalize_angle(ray.original_angle) - expected_original
-                    )
-                    != 0
-                ):
+                if sp.simplify(_normalize_angle(ray.original_angle) - expected_original) != 0:
                     raise StokesGeometryError(
                         "Stokes ray has an inconsistent original-plane projection"
                     )
         if self.sectors:
             if len(self.sector_boundaries) != len(self.sectors):
-                raise StokesGeometryError(
-                    "Stokes boundary and sector counts are inconsistent"
-                )
-            total_width = sp.simplify(
-                sum((sector.width for sector in self.sectors), sp.S.Zero)
-            )
+                raise StokesGeometryError("Stokes boundary and sector counts are inconsistent")
+            total_width = sp.simplify(sum((sector.width for sector in self.sectors), sp.S.Zero))
             if sp.simplify(total_width - _TWO_PI) != 0:
-                raise StokesGeometryError(
-                    "Stokes sectors do not partition one full cover turn"
-                )
+                raise StokesGeometryError("Stokes sectors do not partition one full cover turn")
             for index, sector in enumerate(self.sectors):
                 start = self.sector_boundaries[index]
                 end = self.sector_boundaries[(index + 1) % len(self.sectors)]
@@ -295,20 +262,12 @@ class StokesGeometry:
                 if expected_width == 0:
                     expected_width = _TWO_PI
                 if sector.index != index:
-                    raise StokesGeometryError(
-                        "Stokes sector indices are not contiguous"
-                    )
+                    raise StokesGeometryError("Stokes sector indices are not contiguous")
                 if sp.simplify(_normalize_angle(sector.start_angle) - start) != 0:
-                    raise StokesGeometryError(
-                        "Stokes sector has the wrong start boundary"
-                    )
+                    raise StokesGeometryError("Stokes sector has the wrong start boundary")
                 if sp.simplify(sector.width - expected_width) != 0:
-                    raise StokesGeometryError(
-                        "Stokes sector width disagrees with its boundaries"
-                    )
-                rep_offset = sp.simplify(
-                    _normalize_angle(sector.representative_angle - start)
-                )
+                    raise StokesGeometryError("Stokes sector width disagrees with its boundaries")
+                rep_offset = sp.simplify(_normalize_angle(sector.representative_angle - start))
                 if (
                     rep_offset.is_positive is not True
                     or sp.simplify(sector.width - rep_offset).is_positive is not True
@@ -323,9 +282,7 @@ class StokesGeometry:
                     )
                 width = sp.simplify(sector.width)
                 if width.is_positive is not True:
-                    raise StokesGeometryError(
-                        "Stokes sector width must be provably positive"
-                    )
+                    raise StokesGeometryError("Stokes sector width must be provably positive")
 
 
 _TWO_PI = 2 * sp.pi
@@ -392,26 +349,18 @@ def _formal_terms_in_common_parameter(
     return sp.expand(result)
 
 
-def _leading_negative_term(
-    expression: sp.Expr, parameter: sp.Symbol
-) -> tuple[int, sp.Expr]:
+def _leading_negative_term(expression: sp.Expr, parameter: sp.Symbol) -> tuple[int, sp.Expr]:
     expression = sp.expand(expression)
     terms: dict[int, sp.Expr] = {}
     for term in sp.Add.make_args(expression):
         powers = term.as_powers_dict()
         exponent = sp.sympify(powers.get(parameter, sp.S.Zero))
         if not exponent.is_Integer:
-            raise StokesGeometryError(
-                "uniformized exponential difference has a nonintegral power"
-            )
+            raise StokesGeometryError("uniformized exponential difference has a nonintegral power")
         exponent_int = int(exponent)
         coefficient = sp.simplify(term / parameter**exponent_int)
-        terms[exponent_int] = sp.simplify(
-            terms.get(exponent_int, sp.S.Zero) + coefficient
-        )
-    nonzero = [
-        (power, coeff) for power, coeff in terms.items() if sp.simplify(coeff) != 0
-    ]
+        terms[exponent_int] = sp.simplify(terms.get(exponent_int, sp.S.Zero) + coefficient)
+    nonzero = [(power, coeff) for power, coeff in terms.items() if sp.simplify(coeff) != 0]
     if not nonzero:
         raise ValueError("zero exponential difference has no Stokes rays")
     power, coefficient = min(nonzero, key=lambda item: item[0])
@@ -433,9 +382,7 @@ def _project_ray(
     cover_angle = _normalize_angle(cover_angle)
     local_unwrapped = sp.simplify(ramification * cover_angle)
     local_angle = _normalize_angle(local_unwrapped)
-    original_angle = (
-        _normalize_angle(-local_angle) if sp.sympify(point) == sp.oo else local_angle
-    )
+    original_angle = _normalize_angle(-local_angle) if sp.sympify(point) == sp.oo else local_angle
 
     sheet: int | None = None
     q = sp.simplify(local_unwrapped / _TWO_PI)
@@ -579,10 +526,7 @@ def stokes_connection_patterns(
         active: list[tuple[int, int]] = []
         for ray in geometry.equal_magnitude_rays:
             same_boundary = (
-                sp.simplify(
-                    _normalize_angle(ray.cover_angle) - _normalize_angle(boundary)
-                )
-                == 0
+                sp.simplify(_normalize_angle(ray.cover_angle) - _normalize_angle(boundary)) == 0
             )
             if same_boundary and ray.pair not in active:
                 active.append(ray.pair)
@@ -618,22 +562,16 @@ def stokes_geometry_from_exponential_parts(
 
     parts = tuple(exponential_parts)
     if len(parts) < 2:
-        raise ValueError(
-            "Stokes geometry requires at least two formal exponential branches"
-        )
+        raise ValueError("Stokes geometry requires at least two formal exponential branches")
 
     inferred_point = parts[0].point
     if point is None:
         point = inferred_point
     point = sp.sympify(point)
     if any(sp.simplify(part.point - point) != 0 for part in parts if point != sp.oo):
-        raise ValueError(
-            "all formal exponential parts must belong to the same singular point"
-        )
+        raise ValueError("all formal exponential parts must belong to the same singular point")
     if point == sp.oo and any(part.point != sp.oo for part in parts):
-        raise ValueError(
-            "all formal exponential parts must belong to the same singular point"
-        )
+        raise ValueError("all formal exponential parts must belong to the same singular point")
 
     h = parts[0].local_coordinate
     if any(part.local_coordinate != h for part in parts):
@@ -658,8 +596,7 @@ def stokes_geometry_from_exponential_parts(
     for i in range(len(parts)):
         for j in range(i + 1, len(parts)):
             local_difference = sp.expand(
-                parts[i].local_exponential_polynomial
-                - parts[j].local_exponential_polynomial
+                parts[i].local_exponential_polynomial - parts[j].local_exponential_polynomial
             )
             parameter_difference = sp.expand(parameter_q[i] - parameter_q[j])
             if sp.simplify(parameter_difference) == 0:
@@ -717,9 +654,7 @@ def stokes_geometry_from_exponential_parts(
     sectors: list[StokesSector] = []
     boundaries: tuple[sp.Expr, ...]
     if sector_geometry_complete:
-        ordered = [
-            angle for _, angle in sorted(numeric_boundaries, key=lambda item: item[0])
-        ]
+        ordered = [angle for _, angle in sorted(numeric_boundaries, key=lambda item: item[0])]
         boundaries = tuple(ordered)
         for index, start in enumerate(ordered):
             if index + 1 < len(ordered):

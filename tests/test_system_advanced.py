@@ -18,9 +18,7 @@ from odeanalysis import (
 def test_adaptive_formal_reduction_certificate_is_verified():
     x = sp.symbols("x")
     system = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
-    result = formal_system_analysis(
-        system, adaptive=True, max_depth=1, max_adaptive_depth=4
-    )
+    result = formal_system_analysis(system, adaptive=True, max_depth=1, max_adaptive_depth=4)
     assert result.certificate.verified
     assert result.certificate.attempted_depths
     assert result.certificate.ramification_index == result.ramification_index
@@ -82,8 +80,7 @@ def test_formal_type_stratification_regular_singular_family():
         "regular_singular",
     }
     assert any(
-        stratum.signature.singularity_kind == "regular_singular"
-        for stratum in result.strata
+        stratum.signature.singularity_kind == "regular_singular" for stratum in result.strata
     )
 
 

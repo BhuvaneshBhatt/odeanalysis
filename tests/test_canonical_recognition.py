@@ -43,9 +43,7 @@ def test_recognizes_modified_bessel_without_complex_relabeling():
 def test_recognizes_gauss_hypergeometric_parameters():
     a, b, c = sp.Rational(1, 2), sp.Rational(1, 3), sp.Rational(2, 3)
     equation = (
-        x * (1 - x) * sp.diff(y(x), x, 2)
-        + (c - (a + b + 1) * x) * sp.diff(y(x), x)
-        - a * b * y(x)
+        x * (1 - x) * sp.diff(y(x), x, 2) + (c - (a + b + 1) * x) * sp.diff(y(x), x) - a * b * y(x)
     )
     result = transform_to_canonical(equation, y, x)
     assert result.family is CanonicalEquationFamily.HYPERGEOMETRIC
@@ -83,12 +81,8 @@ def _gauged_projective_hypergeometric_equation():
     canonical_p = sp.cancel((c - (a + b + 1) * z) / (z * (1 - z)))
     canonical_q = sp.cancel(-a * b / (z * (1 - z)))
     h = sp.cancel(alpha * z_prime / z_of_x - beta * z_prime / (1 - z_of_x))
-    p = sp.cancel(
-        z_prime * canonical_p.subs(z, z_of_x) - 2 * h - sp.diff(z_prime, x) / z_prime
-    )
-    q = sp.cancel(
-        z_prime**2 * canonical_q.subs(z, z_of_x) - p * h - sp.diff(h, x) - h**2
-    )
+    p = sp.cancel(z_prime * canonical_p.subs(z, z_of_x) - 2 * h - sp.diff(z_prime, x) / z_prime)
+    q = sp.cancel(z_prime**2 * canonical_q.subs(z, z_of_x) - p * h - sp.diff(h, x) - h**2)
     return sp.diff(y(x), x, 2) + p * sp.diff(y(x), x) + q * y(x)
 
 

@@ -137,9 +137,7 @@ def _single_step(
     try:
         change, _jordan = nilpotent.jordan_form()
     except SYMBOLIC_FAILURES as exc:  # pragma: no cover
-        raise MoserReductionError(
-            "could not construct a Jordan basis for Moser reduction"
-        ) from exc
+        raise MoserReductionError("could not construct a Jordan basis for Moser reduction") from exc
     if sp.simplify(change.det()) == 0:
         raise MoserReductionError("Jordan basis for Moser reduction is singular")
 
@@ -148,15 +146,11 @@ def _single_step(
     before = _candidate_measure(in_jordan_basis)
     best: tuple[tuple[int, int], tuple[int, ...], MatrixLaurentSeries] | None = None
 
-    for weights_tail in combinations_with_replacement(
-        range(max_shear + 1), connection.rows - 1
-    ):
+    for weights_tail in combinations_with_replacement(range(max_shear + 1), connection.rows - 1):
         weights = (0, *tuple(int(weight) for weight in weights_tail))
         if all(weight == 0 for weight in weights):
             continue
-        candidate = _monomial_shear_transform(
-            in_jordan_basis, weights, max_power=max_power
-        )
+        candidate = _monomial_shear_transform(in_jordan_basis, weights, max_power=max_power)
         measure = _candidate_measure(candidate)
         if measure <= before:
             continue

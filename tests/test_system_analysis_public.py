@@ -61,9 +61,7 @@ def test_parameterized_system_finds_rank_and_collision_loci():
     system = FirstOrderSystem(x, sp.ImmutableMatrix([[a / x, 0], [0, -a / x]]))
     result = system_parameter_analysis(system, (a,))
     assert any(
-        sp.simplify(p / a) in (1, -1, 2, -2, 4, -4)
-        for p in result.transition_polynomials
-        if p != 0
+        sp.simplify(p / a) in (1, -1, 2, -2, 4, -4) for p in result.transition_polynomials if p != 0
     )
     assert result.exhaustive
     assert result.strata

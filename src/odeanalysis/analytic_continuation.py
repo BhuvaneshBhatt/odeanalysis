@@ -88,9 +88,7 @@ class StokesMatrix:
 
         if self.matrix.shape != (2, 2):
             return False
-        return (
-            self.matrix.det() == 1 and self.matrix[0, 0] == 1 and self.matrix[1, 1] == 1
-        )
+        return self.matrix.det() == 1 and self.matrix[0, 0] == 1 and self.matrix[1, 1] == 1
 
 
 @dataclass(frozen=True)
@@ -142,9 +140,7 @@ def hypergeometric_connection_matrix(
         CanonicalBasis.HYPERGEOMETRIC_INFINITY,
     }
     if source not in allowed or target not in allowed:
-        raise ValueError(
-            "source and target must be Gauss-hypergeometric canonical bases"
-        )
+        raise ValueError("source and target must be Gauss-hypergeometric canonical bases")
     zero_one = sp.ImmutableMatrix(
         (
             (
@@ -153,9 +149,7 @@ def hypergeometric_connection_matrix(
             ),
             (
                 _gamma(c) * _gamma(a + b - c) / (_gamma(a) * _gamma(b)),
-                _gamma(2 - c)
-                * _gamma(a + b - c)
-                / (_gamma(a - c + 1) * _gamma(b - c + 1)),
+                _gamma(2 - c) * _gamma(a + b - c) / (_gamma(a - c + 1) * _gamma(b - c + 1)),
             ),
         )
     )
@@ -229,9 +223,7 @@ def connection_matrix(
     raise ValueError(f"exact connection matrices are not implemented for {family!r}")
 
 
-def kummer_connection_matrices(
-    a: sp.Expr, c: sp.Expr
-) -> tuple[ConnectionMatrix, ConnectionMatrix]:
+def kummer_connection_matrices(a: sp.Expr, c: sp.Expr) -> tuple[ConnectionMatrix, ConnectionMatrix]:
     """Return the two exact lateral Kummer connection matrices at infinity."""
 
     a, c = map(sp.sympify, (a, c))
@@ -275,20 +267,8 @@ def stokes_matrices(family: str, **params: sp.Expr) -> tuple[StokesMatrix, ...]:
         c = sp.sympify(params["c"])
         # Standard formal normalization.  These multipliers stay factored;
         # no Gamma reflection simplification is performed here.
-        upper = (
-            2
-            * sp.pi
-            * sp.I
-            * sp.exp(sp.I * sp.pi * (c - a))
-            / (_gamma(a) * _gamma(1 + a - c))
-        )
-        lower = (
-            2
-            * sp.pi
-            * sp.I
-            * sp.exp(sp.I * sp.pi * a)
-            / (_gamma(c - a) * _gamma(1 - a))
-        )
+        upper = 2 * sp.pi * sp.I * sp.exp(sp.I * sp.pi * (c - a)) / (_gamma(a) * _gamma(1 + a - c))
+        lower = 2 * sp.pi * sp.I * sp.exp(sp.I * sp.pi * a) / (_gamma(c - a) * _gamma(1 - a))
         return (
             StokesMatrix("kummer", 0, sp.ImmutableMatrix(((1, upper), (0, 1)))),
             StokesMatrix("kummer", 1, sp.ImmutableMatrix(((1, 0), (lower, 1)))),
@@ -338,6 +318,4 @@ def local_monodromy(family: str, point: sp.Expr, **params: sp.Expr) -> LocalMono
         for factor in factors:
             product = factor.matrix * product
         return LocalMonodromy("airy", point, "exact_wkb", product, formal, factors)
-    raise ValueError(
-        f"actual local monodromy is not implemented for {family!r} at {point}"
-    )
+    raise ValueError(f"actual local monodromy is not implemented for {family!r} at {point}")

@@ -19,9 +19,7 @@ def test_companion_system_preserves_scalar_equation_and_forcing():
     x = sp.symbols("x")
     y = sp.Function("y")
     p, q, r = sp.symbols("p q r")
-    system = companion_system(
-        sp.diff(y(x), x, 2) + p * sp.diff(y(x), x) + q * y(x) + r, y, x
-    )
+    system = companion_system(sp.diff(y(x), x, 2) + p * sp.diff(y(x), x) + q * y(x) + r, y, x)
 
     assert system.dimension == 2
     assert system.matrix == sp.ImmutableMatrix([[0, 1], [-q, -p]])
@@ -100,9 +98,7 @@ def test_formal_block_partition_tracks_repeated_completed_parts():
     # This equation has a repeated primary exponential that splits only after
     # secondary Newton--Puiseux refinement, giving two distinct completed Q's.
     ode = (
-        sp.diff(y(x), x, 2)
-        - 2 / x**3 * sp.diff(y(x), x)
-        + (1 / x**6 + 3 / x**4 - 1 / x**3) * y(x)
+        sp.diff(y(x), x, 2) - 2 / x**3 * sp.diff(y(x), x) + (1 / x**6 + 3 / x**4 - 1 / x**3) * y(x)
     )
     parts = complete_formal_exponential_parts(ode, y, x)
     partition = formal_block_partition(parts)

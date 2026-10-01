@@ -26,12 +26,7 @@ def _mixed_repeated_operator():
     a0 = (2 * x**2 - 3 * x + 2) / (x**6 * (x - 2))
     a1 = (2 * x**3 - 6 * x**2 - 5 * x + 2) / (x**4 * (x - 2))
     a2 = (4 * x**2 - 9 * x - 2) / (x**2 * (x - 2))
-    ode = (
-        sp.diff(y(x), x, 3)
-        + a2 * sp.diff(y(x), x, 2)
-        + a1 * sp.diff(y(x), x)
-        + a0 * y(x)
-    )
+    ode = sp.diff(y(x), x, 3) + a2 * sp.diff(y(x), x, 2) + a1 * sp.diff(y(x), x) + a0 * y(x)
     return x, y, ode
 
 
@@ -61,9 +56,7 @@ def test_formal_block_diagonalization_removes_coupling_by_sylvester_recursion():
     assert split.eigenvalues == (-1, 1)
     assert split.dimensions == (1, 2)
     assert all(_matrix_zero(P * P - P) for P in split.projectors)
-    assert _matrix_zero(
-        sum((sp.Matrix(P) for P in split.projectors), sp.zeros(3)) - sp.eye(3)
-    )
+    assert _matrix_zero(sum((sp.Matrix(P) for P in split.projectors), sp.zeros(3)) - sp.eye(3))
     assert split.verify()
     assert decomposition.verify()
 
@@ -98,12 +91,7 @@ def test_scalar_exponential_block_decomposition_isolates_repeated_mixed_block():
     assert simple.metadata is not None
     assert sp.simplify(repeated.metadata.exponential_polynomial - 1 / x) == 0
     assert sp.simplify(simple.metadata.exponential_polynomial + 1 / x) == 0
-    assert (
-        sp.simplify(
-            repeated.parameter_exponential_polynomial - 1 / decomposition.parameter
-        )
-        == 0
-    )
+    assert sp.simplify(repeated.parameter_exponential_polynomial - 1 / decomposition.parameter) == 0
 
 
 def test_cyclic_scalarization_of_repeated_block_recovers_its_solution_space():
@@ -115,8 +103,7 @@ def test_cyclic_scalarization_of_repeated_block_recovers_its_solution_space():
 
     for solution in (sp.exp(1 / t), sp.exp(1 / t) * sp.log(t)):
         residual = sum(
-            operator.coefficients[j] * sp.diff(solution, t, j)
-            for j in range(operator.order + 1)
+            operator.coefficients[j] * sp.diff(solution, t, j) for j in range(operator.order + 1)
         )
         assert sp.simplify(residual) == 0
 
@@ -129,12 +116,8 @@ def test_mixed_repeated_irregular_basis_is_now_complete_and_has_monodromy():
     assert basis.limitation is None
     assert basis.dimension == 3
     repeated = next(block for block in basis.blocks if block.dimension == 2)
-    expressions = tuple(
-        sp.simplify(vector.expression) for vector in repeated.basis_vectors
-    )
+    expressions = tuple(sp.simplify(vector.expression) for vector in repeated.basis_vectors)
     assert expressions == (sp.exp(1 / x), sp.exp(1 / x) * sp.log(x))
 
     monodromy = formal_monodromy(basis)
-    assert monodromy.local_matrix == sp.Matrix(
-        [[1, 2 * sp.pi * sp.I, 0], [0, 1, 0], [0, 0, 1]]
-    )
+    assert monodromy.local_matrix == sp.Matrix([[1, 2 * sp.pi * sp.I, 0], [0, 1, 0], [0, 0, 1]])

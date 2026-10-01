@@ -23,9 +23,7 @@ def test_production_odeanalysis_does_not_import_asymptotic():
                 if module == "asymptotic" or module.startswith("asymptotic."):
                     violations.append(f"{path}:{node.lineno}")
             elif (
-                isinstance(node, ast.Call)
-                and node.args
-                and isinstance(node.args[0], ast.Constant)
+                isinstance(node, ast.Call) and node.args and isinstance(node.args[0], ast.Constant)
             ):
                 target = node.args[0].value
                 if not isinstance(target, str) or not (

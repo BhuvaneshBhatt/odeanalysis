@@ -184,9 +184,7 @@ def _parameterized_frobenius_family(
     if sum(int(mult) for _, mult in roots) != operator.order:
         raise FormalBasisError("could not resolve the complete indicial root multiset")
 
-    bcoeff = [
-        tuple(_taylor_coeff(bj, x, sp.S.Zero, q) for q in range(terms)) for bj in b
-    ]
+    bcoeff = [tuple(_taylor_coeff(bj, x, sp.S.Zero, q) for q in range(terms)) for bj in b]
     coefficients: list[sp.Expr] = [sp.S.One]
     for m in range(1, terms):
         numerator = sp.S.Zero
@@ -233,9 +231,7 @@ def _regularized_family_derivative(
     result = sp.S.Zero
     for m, coefficient in enumerate(family.coefficients):
         term = (r - root) ** pole_order * coefficient * x ** (r + m)
-        differentiated = sp.diff(term, r, derivative_order) / factorial(
-            derivative_order
-        )
+        differentiated = sp.diff(term, r, derivative_order) / factorial(derivative_order)
         try:
             value = sp.limit(differentiated, r, root)
         except SYMBOLIC_FAILURES as exc:
@@ -256,10 +252,7 @@ def _basis_for_operator_at_zero(
     vectors: list[LogarithmicBasisVector] = []
     for root, multiplicity in family.roots:
         pole_order = max(
-            (
-                _pole_order_at(c, family.exponent_variable, root)
-                for c in family.coefficients
-            ),
+            (_pole_order_at(c, family.exponent_variable, root) for c in family.coefficients),
             default=0,
         )
         for offset in range(int(multiplicity)):
@@ -373,8 +366,7 @@ def _q_conjugated_cover_operator(
     t = sp.Dummy("t", positive=True)
     q_t = analytic_powsimp(sp.expand(local_q.subs(h, t**ramification)))
     coefficients = tuple(
-        sp.cancel(sp.together(c.subs(h, t**ramification)))
-        for c in localized.operator.coefficients
+        sp.cancel(sp.together(c.subs(h, t**ramification))) for c in localized.operator.coefficients
     )
     amplitude = sp.Function("_V")
     v = amplitude(t)
@@ -421,9 +413,7 @@ def _conjugate_scalar_operator_by_exponential(
         ) from exc
 
 
-def _cover_to_local(
-    expr: sp.Expr, t: sp.Symbol, h: sp.Symbol, ramification: int
-) -> sp.Expr:
+def _cover_to_local(expr: sp.Expr, t: sp.Symbol, h: sp.Symbol, ramification: int) -> sp.Expr:
     result = sp.expand(expr).subs(sp.log(t), sp.log(h) / ramification)
     result = result.subs(t, h ** sp.Rational(1, ramification))
     return analytic_powsimp(sp.expand(result))
@@ -454,9 +444,7 @@ def _wrap_cover_vectors(
                 local_parameter=t,
                 parameter_expression=vector.parameter_expression,
                 local_expression=analytic_powsimp(sp.expand(local_expression)),
-                expression=localized.to_original(
-                    analytic_powsimp(sp.expand(local_expression))
-                ),
+                expression=localized.to_original(analytic_powsimp(sp.expand(local_expression))),
             )
         )
     return tuple(result)
@@ -497,24 +485,17 @@ def _simple_irregular_blocks(
                     a.exponential_part.exponential_polynomial,
                     part.exponential_polynomial,
                 )
-                and expressions_equal(
-                    a.exponential_part.algebraic_power, part.algebraic_power
-                )
+                and expressions_equal(a.exponential_part.algebraic_power, part.algebraic_power)
             )
         t = amplitude.local_parameter
         beta = sp.simplify(part.ramification_index * part.algebraic_power)
         reduced = sp.expand(
             t**beta
-            * sum(
-                amplitude.coefficients[k] * t**k
-                for k in range(len(amplitude.coefficients))
-            )
+            * sum(amplitude.coefficients[k] * t**k for k in range(len(amplitude.coefficients)))
         )
         h = localized.local_variable
         local_q = part.local_exponential_polynomial.subs(part.local_coordinate, h)
-        amplitude_h = amplitude.local_series.subs(
-            amplitude.exponential_part.local_coordinate, h
-        )
+        amplitude_h = amplitude.local_series.subs(amplitude.exponential_part.local_coordinate, h)
         local_expr = sp.exp(local_q) * h**part.algebraic_power * amplitude_h
         vector = LogarithmicBasisVector(
             source_exponent=part.algebraic_power,
@@ -528,9 +509,7 @@ def _simple_irregular_blocks(
             parameter_expression=reduced,
             local_expression=analytic_powsimp(sp.expand(local_expr)),
             expression=sp.simplify(
-                sp.exp(part.exponential_polynomial)
-                * part.algebraic_prefactor
-                * amplitude.series
+                sp.exp(part.exponential_polynomial) * part.algebraic_prefactor * amplitude.series
             ),
         )
         blocks.append(
@@ -545,12 +524,9 @@ def _simple_irregular_blocks(
     merged: list[FormalSolutionBlock] = []
     for block in blocks:
         for index, existing in enumerate(merged):
-            if (
-                existing.ramification_index == block.ramification_index
-                and expressions_equal(
-                    existing.local_exponential_polynomial,
-                    block.local_exponential_polynomial,
-                )
+            if existing.ramification_index == block.ramification_index and expressions_equal(
+                existing.local_exponential_polynomial,
+                block.local_exponential_polynomial,
             ):
                 merged[index] = FormalSolutionBlock(
                     local_exponential_polynomial=existing.local_exponential_polynomial,
@@ -602,8 +578,7 @@ def _repeated_irregular_blocks_from_system_decomposition(
         return (
             (),
             False,
-            decomposition.limitation
-            or "formal exponential-block decomposition is incomplete",
+            decomposition.limitation or "formal exponential-block decomposition is incomplete",
         )
 
     blocks: list[FormalSolutionBlock] = []
@@ -799,9 +774,7 @@ def formal_logarithmic_basis(
         terms=terms,
         operator_order=order,
         complete=dimension == order and decomposition_complete,
-        limitation=limitation
-        if dimension != order or not decomposition_complete
-        else None,
+        limitation=limitation if dimension != order or not decomposition_complete else None,
     )
 
 
@@ -815,15 +788,11 @@ def _term_signature(
     power = sp.simplify(powers.get(variable, sp.S.Zero))
     log_degree_expr = powers.get(logv, sp.S.Zero)
     if log_degree_expr.is_Integer is not True:
-        raise FormalBasisError(
-            "formal monodromy encountered a non-polynomial logarithm"
-        )
+        raise FormalBasisError("formal monodromy encountered a non-polynomial logarithm")
     log_degree = int(log_degree_expr)
     coefficient = sp.simplify(term / (variable**power * logv**log_degree))
     if coefficient.has(variable, logv):
-        raise FormalBasisError(
-            f"could not decompose formal monomial {term!s} into power/log form"
-        )
+        raise FormalBasisError(f"could not decompose formal monomial {term!s} into power/log form")
     return power, log_degree, coefficient
 
 
@@ -864,9 +833,7 @@ def _coordinates_in_basis(
     basis_expressions: tuple[sp.Expr, ...],
     variable: sp.Symbol,
 ) -> tuple[sp.Expr, ...]:
-    dictionaries = tuple(
-        _formal_coefficient_dict(expr, variable) for expr in basis_expressions
-    )
+    dictionaries = tuple(_formal_coefficient_dict(expr, variable) for expr in basis_expressions)
     target_dict = _formal_coefficient_dict(target, variable)
     keys = sorted(
         set(target_dict).union(*(set(item) for item in dictionaries)),
@@ -894,9 +861,7 @@ def _coordinates_in_basis(
         raise FormalBasisError("could not solve formal monodromy coordinates") from exc
     solutions = list(solution_set)
     if len(solutions) != 1:
-        raise FormalBasisError(
-            "formal monodromy coordinates are not uniquely determined"
-        )
+        raise FormalBasisError("formal monodromy coordinates are not uniquely determined")
     solution = tuple(sp.simplify(value) for value in solutions[0])
     generated = set().union(*(value.free_symbols for value in solution))
     basis_symbols = set().union(
@@ -943,9 +908,7 @@ def _local_monodromy_matrix(basis: FormalLogarithmicBasis) -> sp.Matrix | None:
     h = basis.local_coordinate
 
     for source_index, source in enumerate(blocks):
-        continued_q = _continued_local_exponential(
-            source.local_exponential_polynomial, h
-        )
+        continued_q = _continued_local_exponential(source.local_exponential_polynomial, h)
         targets = [
             (index, block)
             for index, block in enumerate(blocks)
@@ -966,9 +929,7 @@ def _local_monodromy_matrix(basis: FormalLogarithmicBasis) -> sp.Matrix | None:
                 turn_fraction=fraction,
             )
             if source.local_parameter != target.local_parameter:
-                continued = continued.subs(
-                    source.local_parameter, target.local_parameter
-                )
+                continued = continued.subs(source.local_parameter, target.local_parameter)
             try:
                 coordinates = _coordinates_in_basis(
                     continued, target_expressions, target.local_parameter

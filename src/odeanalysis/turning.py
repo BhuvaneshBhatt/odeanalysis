@@ -89,9 +89,7 @@ class TurningPointAnalysis:
     def verify(self) -> bool:
         """Verify every reported point and, when complete, the full numerator degree."""
 
-        if not self.normal_form.verify() or not all(
-            point.verify() for point in self.points
-        ):
+        if not self.normal_form.verify() or not all(point.verify() for point in self.points):
             return False
         if not self.complete:
             return True
@@ -104,9 +102,7 @@ class TurningPointAnalysis:
         multiplicity = sum(point.multiplicity for point in self.points)
         if degree != multiplicity:
             return False
-        return all(
-            sp.simplify(denominator.subs(x, point.point)) != 0 for point in self.points
-        )
+        return all(sp.simplify(denominator.subs(x, point.point)) != 0 for point in self.points)
 
 
 @dataclass(frozen=True)
@@ -144,17 +140,11 @@ class WKBExpansion:
         if sp.simplify(s0**2 - self.normal_form.potential) != 0:
             return False
         for n in range(1, len(self.coefficients)):
-            convolution = sum(
-                self.coefficients[j] * self.coefficients[n - j] for j in range(1, n)
-            )
-            expected = sp.cancel(
-                -(sp.diff(self.coefficients[n - 1], x) + convolution) / (2 * s0)
-            )
+            convolution = sum(self.coefficients[j] * self.coefficients[n - j] for j in range(1, n))
+            expected = sp.cancel(-(sp.diff(self.coefficients[n - 1], x) + convolution) / (2 * s0))
             if sp.simplify(self.coefficients[n] - expected) != 0:
                 return False
-        expected_series = sp.Add(
-            *(eps**n * value for n, value in enumerate(self.coefficients))
-        )
+        expected_series = sp.Add(*(eps**n * value for n, value in enumerate(self.coefficients)))
         return sp.simplify(self.log_derivative_series - expected_series) == 0
 
 
@@ -203,9 +193,7 @@ class UniformWKBReduction:
         if sp.simplify(phase_prime**2 - q) != 0:
             return False
         if self.canonical_family == "airy":
-            expected_transform = sp.Pow(
-                sp.Rational(3, 2) * self.phase_integral, sp.Rational(2, 3)
-            )
+            expected_transform = sp.Pow(sp.Rational(3, 2) * self.phase_integral, sp.Rational(2, 3))
         elif self.canonical_family == "weber":
             expected_transform = sp.sqrt(2 * self.phase_integral)
         else:
@@ -312,11 +300,7 @@ def analyze_turning_points(
                 normal_form=normal,
             )
         )
-    limitation = (
-        None
-        if complete
-        else "could not resolve every zero of the normal-form potential"
-    )
+    limitation = None if complete else "could not resolve every zero of the normal-form potential"
     return TurningPointAnalysis(normal, tuple(points), complete, limitation)
 
 
@@ -388,9 +372,7 @@ def wkb_expansion(
     for branch in (1, -1):
         coefficients = [sp.simplify(branch * sp.sqrt(normal.potential))]
         for n in range(1, order + 1):
-            convolution = sum(
-                coefficients[j] * coefficients[n - j] for j in range(1, n)
-            )
+            convolution = sum(coefficients[j] * coefficients[n - j] for j in range(1, n))
             value = sp.cancel(
                 -(sp.diff(coefficients[n - 1], x) + convolution) / (2 * coefficients[0])
             )

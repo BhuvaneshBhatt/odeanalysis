@@ -69,19 +69,11 @@ def parameterized_turning_analysis(
         strata.append(
             ParameterizedTurningStratum(
                 case.condition,
-                tuple(
-                    sorted(
-                        sample.items(), key=lambda item: sp.default_sort_key(item[0])
-                    )
-                ),
+                tuple(sorted(sample.items(), key=lambda item: sp.default_sort_key(item[0]))),
                 tuple(tp.multiplicity for tp in finite),
                 tuple(tp.kind.value for tp in finite),
                 tuple(
-                    "airy"
-                    if tp.multiplicity == 1
-                    else "weber"
-                    if tp.multiplicity == 2
-                    else None
+                    "airy" if tp.multiplicity == 1 else "weber" if tp.multiplicity == 2 else None
                     for tp in finite
                 ),
                 geometry.status == "complete",

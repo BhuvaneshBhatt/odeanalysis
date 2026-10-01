@@ -80,9 +80,7 @@ class SingularityStructure:
 
     def at(self, point: sp.Expr) -> SingularityPointStructure | None:
         point = sp.sympify(point)
-        return next(
-            (item for item in self.points if item.singularity.point == point), None
-        )
+        return next((item for item in self.points if item.singularity.point == point), None)
 
 
 def _coefficient_singularities(
@@ -160,10 +158,7 @@ def frobenius_convergence(
 
 def frobenius_local_monodromy(analysis: FrobeniusAnalysis) -> FrobeniusLocalMonodromy:
     """Derive local monodromy from a completed Frobenius analysis."""
-    if (
-        not analysis.root_multiplicities
-        or len(analysis.roots) != analysis.operator.order
-    ):
+    if not analysis.root_multiplicities or len(analysis.roots) != analysis.operator.order:
         return FrobeniusLocalMonodromy(
             analysis.point, None, False, None, "indicial roots are incomplete"
         )
@@ -226,9 +221,7 @@ def _regular_point_structure(
             local_operator, point=local_point, terms=terms, assumptions=assumptions
         )
     except (NotImplementedError, ValueError):
-        return SingularityPointStructure(
-            singularity, None, None, None, None, coordinate
-        )
+        return SingularityPointStructure(singularity, None, None, None, None, coordinate)
     monodromy = frobenius_local_monodromy(frob)
     if point == sp.oo:
         local_points, exhaustive = _coefficient_singularities(local_operator)

@@ -40,9 +40,7 @@ def test_regular_singular_infinity_has_full_frobenius_and_monodromy_data():
     infinity = singularity_structure(ode, y, x).at(sp.oo)
     assert infinity is not None
     assert infinity.singularity.kind is ODESingularityKind.REGULAR
-    assert (
-        infinity.local_coordinate is not None and infinity.local_coordinate.is_infinity
-    )
+    assert infinity.local_coordinate is not None and infinity.local_coordinate.is_infinity
     assert infinity.frobenius is not None
     assert infinity.convergence is not None and infinity.convergence.point == sp.oo
     assert infinity.monodromy is not None and infinity.monodromy.certified
@@ -56,9 +54,7 @@ def test_parameter_assumptions_change_infinity_classification():
     zero = singularity_structure(ode, y, x, assumptions=sp.Eq(a, 0)).at(sp.oo)
     nonzero = singularity_structure(ode, y, x, assumptions=sp.Ne(a, 0)).at(sp.oo)
     assert zero is not None and zero.singularity.kind is ODESingularityKind.REGULAR
-    assert (
-        nonzero is not None and nonzero.singularity.kind is ODESingularityKind.IRREGULAR
-    )
+    assert nonzero is not None and nonzero.singularity.kind is ODESingularityKind.IRREGULAR
 
 
 def test_apparent_singularity_reuses_certified_trivial_monodromy():
@@ -75,8 +71,6 @@ def test_wronskian_independence_uses_symbolic_assumptions():
     x, a = sp.symbols("x a")
     y = sp.Function("y")
     ode = sp.diff(y(x), x, 2) - a * sp.diff(y(x), x)
-    result = wronskian_analysis(
-        ode, y, x, basis=(1, sp.exp(a * x)), assumptions=sp.Ne(a, 0)
-    )
+    result = wronskian_analysis(ode, y, x, basis=(1, sp.exp(a * x)), assumptions=sp.Ne(a, 0))
     assert result.independent is True
     assert result.wronskian == a * sp.exp(a * x)

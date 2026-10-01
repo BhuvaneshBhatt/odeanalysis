@@ -54,10 +54,7 @@ def test_nontrivial_third_order_frobenius_recurrence():
     # x^3 y''' + x^2 y'' - x y' + x^3 y = 0.
     # The regularized coefficient b_0=-x+x^3 contributes actual recurrence terms.
     ode = (
-        x**3 * sp.diff(y(x), x, 3)
-        + x**2 * sp.diff(y(x), x, 2)
-        - x * sp.diff(y(x), x)
-        + x**3 * y(x)
+        x**3 * sp.diff(y(x), x, 3) + x**2 * sp.diff(y(x), x, 2) - x * sp.diff(y(x), x) + x**3 * y(x)
     )
     result = frobenius_analysis(ode, y, x, point=0, terms=5)
     assert result.indicial_polynomial is not None
@@ -106,8 +103,6 @@ def test_frobenius_diagnostics_explain_logarithmic_obstruction():
     y = sp.Function("y")
     ode = x**2 * sp.diff(y(x), x, 2) + x * sp.diff(y(x), x) + (x**2 - 1) * y(x)
     result = frobenius_analysis(ode, y, x, point=0, terms=5)
-    diagnostics = [
-        item for item in result.diagnostics if item.code == "logarithmic-obstruction"
-    ]
+    diagnostics = [item for item in result.diagnostics if item.code == "logarithmic-obstruction"]
     assert diagnostics
     assert any(item.order == 2 for item in diagnostics)

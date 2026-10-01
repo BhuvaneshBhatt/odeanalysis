@@ -57,10 +57,7 @@ class LinearDifferentialOperator:
     def homogeneous_expression(self) -> sp.Expr:
         yx = self.function(self.variable)
         return sp.expand(
-            sum(
-                self.coefficients[j] * sp.diff(yx, self.variable, j)
-                for j in range(self.order + 1)
-            )
+            sum(self.coefficients[j] * sp.diff(yx, self.variable, j) for j in range(self.order + 1))
         )
 
     @property
@@ -94,12 +91,8 @@ class LinearDifferentialOperator:
         needs rational/meromorphic coefficients and local singularity metadata.
         """
 
-        if not all(
-            sp.sympify(c).is_polynomial(self.variable) for c in self.coefficients
-        ):
-            raise ValueError(
-                "SymPy holonomic conversion requires polynomial coefficients"
-            )
+        if not all(sp.sympify(c).is_polynomial(self.variable) for c in self.coefficients):
+            raise ValueError("SymPy holonomic conversion requires polynomial coefficients")
         from sympy.holonomic.holonomic import DifferentialOperators
 
         ring, dx = DifferentialOperators(sp.EX.old_poly_ring(self.variable), "Dx")
@@ -124,9 +117,7 @@ class LinearDifferentialOperator:
         for k in range(1, self.order + 1):
             current = sp.expand(-(new_variable**2) * sp.diff(current, new_variable))
             replacements[sp.diff(yx, self.variable, k)] = current
-        transformed = self.expression.xreplace(replacements).subs(
-            self.variable, 1 / new_variable
-        )
+        transformed = self.expression.xreplace(replacements).subs(self.variable, 1 / new_variable)
         transformed = sp.factor(sp.together(transformed))
         return LinearDifferentialOperator.from_ode(transformed, g, new_variable)
 
@@ -169,12 +160,8 @@ class LinearDifferentialOperator:
         homogeneous = sp.expand(sum(coeffs[k] * gens[k] for k in range(order + 1)))
         remainder = sp.cancel(sp.together(equation - homogeneous))
         if zero_status(coeffs[-1]) is True:
-            raise ValueError(
-                "could not determine a nonzero leading derivative coefficient"
-            )
-        return cls(
-            variable=variable, function=f, coefficients=coeffs, inhomogeneous=remainder
-        )
+            raise ValueError("could not determine a nonzero leading derivative coefficient")
+        return cls(variable=variable, function=f, coefficients=coeffs, inhomogeneous=remainder)
 
 
 def _coerce_linear_operator(
@@ -187,7 +174,5 @@ def _coerce_linear_operator(
     if isinstance(ode, LinearDifferentialOperator):
         return ode
     if function is None or variable is None:
-        raise TypeError(
-            "function and variable are required when ode is not an operator"
-        )
+        raise TypeError("function and variable are required when ode is not an operator")
     return LinearDifferentialOperator.from_ode(ode, function, variable)

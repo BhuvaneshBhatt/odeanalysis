@@ -53,8 +53,7 @@ class KovacicCase2Certificate:
         if sp.simplify(auxiliary) != 0:
             return False
         return bool(self.logarithmic_derivatives) and all(
-            sp.simplify(sp.diff(w, x) + w**2 - r) == 0
-            for w in self.logarithmic_derivatives
+            sp.simplify(sp.diff(w, x) + w**2 - r) == 0 for w in self.logarithmic_derivatives
         )
 
 
@@ -95,9 +94,7 @@ class KovacicCase3Certificate:
             return False
         omega = sp.Symbol("omega")
         expected_poly = sp.expand(
-            sum(
-                s**i * p_by_index[i] * omega**i / factorial(n - i) for i in range(n + 1)
-            )
+            sum(s**i * p_by_index[i] * omega**i / factorial(n - i) for i in range(n + 1))
         )
         return sp.simplify(expected_poly - self.algebraic_log_derivative) == 0
 
@@ -138,9 +135,7 @@ class KovacicAnalysis:
         if sp.simplify(self.normal_form_potential - r) != 0:
             return False
         if self.outcome is KovacicOutcome.CASE_1:
-            return bool(self.factorizations) and all(
-                f.verify() for f in self.factorizations
-            )
+            return bool(self.factorizations) and all(f.verify() for f in self.factorizations)
         if self.outcome is KovacicOutcome.CASE_2:
             return bool(self.case2_certificates) and all(
                 certificate.verify(r, self.operator.variable)
@@ -162,9 +157,7 @@ def _normal_form_potential(op: LinearDifferentialOperator) -> sp.Expr:
     return sp.cancel(p**2 / 4 + sp.diff(p, x) / 2 - q)
 
 
-def _pole_data(
-    r: sp.Expr, x: sp.Symbol
-) -> tuple[tuple[tuple[sp.Expr, int], ...], int, sp.Expr]:
+def _pole_data(r: sp.Expr, x: sp.Symbol) -> tuple[tuple[tuple[sp.Expr, int], ...], int, sp.Expr]:
     numerator, denominator = sp.cancel(r).as_numer_denom()
     try:
         den_poly = sp.Poly(denominator, x, extension=True)
@@ -179,9 +172,7 @@ def _pole_data(
         )
     )
     infinity_order = int(den_poly.degree() - num_poly.degree())
-    infinity_b = (
-        sp.cancel(num_poly.LC() / den_poly.LC()) if infinity_order == 2 else sp.S.Zero
-    )
+    infinity_b = sp.cancel(num_poly.LC() / den_poly.LC()) if infinity_order == 2 else sp.S.Zero
     return finite, infinity_order, infinity_b
 
 
@@ -205,9 +196,7 @@ def _pole_b(r: sp.Expr, x: sp.Symbol, pole: sp.Expr) -> sp.Expr:
     return sp.simplify(sp.limit((x - pole) ** 2 * r, x, pole))
 
 
-def _monic_auxiliary_solution(
-    expr_builder, degree: int, x: sp.Symbol
-) -> sp.Expr | None:
+def _monic_auxiliary_solution(expr_builder, degree: int, x: sp.Symbol) -> sp.Expr | None:
     if degree == 0:
         return sp.S.One if sp.simplify(expr_builder(sp.S.One)) == 0 else None
     coeffs = sp.symbols(f"_k0:{degree}")
@@ -265,9 +254,7 @@ def _case2(
                 continue
             theta = sp.cancel(
                 sp.Rational(1, 2)
-                * sum(
-                    e / (x - pole) for e, pole in zip(finite_values, poles, strict=True)
-                )
+                * sum(e / (x - pole) for e, pole in zip(finite_values, poles, strict=True))
             )
 
             def auxiliary(p, theta=theta):
@@ -291,13 +278,8 @@ def _case2(
             phi = sp.cancel(theta + sp.diff(p, x) / p)
             constant = sp.cancel(sp.diff(phi, x) / 2 + phi**2 / 2 - r)
             discriminant = sp.cancel(phi**2 - 4 * constant)
-            roots = tuple(
-                sp.simplify((phi + sign * sp.sqrt(discriminant)) / 2)
-                for sign in (1, -1)
-            )
-            valid = tuple(
-                w for w in roots if sp.simplify(sp.diff(w, x) + w**2 - r) == 0
-            )
+            roots = tuple(sp.simplify((phi + sign * sp.sqrt(discriminant)) / 2) for sign in (1, -1))
+            valid = tuple(w for w in roots if sp.simplify(sp.diff(w, x) + w**2 - r) == 0)
             if valid:
                 certificates.append(KovacicCase2Certificate(degree, theta, p, valid))
     return tuple(certificates)
@@ -321,9 +303,7 @@ def _case3_sets(
             choices.append((sp.Integer(12),))
         else:
             root = sp.sqrt(1 + 4 * _pole_b(r, x, pole))
-            values = [
-                6 + sp.Rational(12 * k, n) * root for k in range(-n // 2, n // 2 + 1)
-            ]
+            values = [6 + sp.Rational(12 * k, n) * root for k in range(-n // 2, n // 2 + 1)]
             choices.append(_integer_set(values))
     root_inf = sp.sqrt(1 + 4 * infinity_b)
     infinity_choices = _integer_set(
@@ -350,17 +330,12 @@ def _case3(
         s = sp.prod(x - pole for pole in poles)
         for finite_values in product(*choices):
             for e_inf in infinity_choices:
-                degree = _integer_value(
-                    sp.Rational(n, 12) * (e_inf - sum(finite_values))
-                )
+                degree = _integer_value(sp.Rational(n, 12) * (e_inf - sum(finite_values)))
                 if degree is None:
                     continue
                 theta = sp.cancel(
                     sp.Rational(n, 12)
-                    * sum(
-                        e / (x - pole)
-                        for e, pole in zip(finite_values, poles, strict=True)
-                    )
+                    * sum(e / (x - pole) for e, pole in zip(finite_values, poles, strict=True))
                 )
 
                 def terminal(polynomial, n=n, s=s, theta=theta):
@@ -387,10 +362,7 @@ def _case3(
                     continue
                 omega = sp.Symbol("omega")
                 equation = sp.expand(
-                    sum(
-                        s**i * by_index[i] * omega**i / factorial(n - i)
-                        for i in range(n + 1)
-                    )
+                    sum(s**i * by_index[i] * omega**i / factorial(n - i) for i in range(n + 1))
                 )
                 certificate = KovacicCase3Certificate(
                     n=n,
@@ -417,14 +389,10 @@ def kovacic_analysis(
 
     op = _coerce_linear_operator(ode, function, variable)
     if not op.is_homogeneous or op.order != 2:
-        raise ValueError(
-            "Kovacic analysis requires a homogeneous second-order operator"
-        )
+        raise ValueError("Kovacic analysis requires a homogeneous second-order operator")
     normalized = op.normalized()
     x = normalized.variable
-    if not all(
-        sp.cancel(c).is_rational_function(x) for c in normalized.coefficients[:-1]
-    ):
+    if not all(sp.cancel(c).is_rational_function(x) for c in normalized.coefficients[:-1]):
         raise ValueError("Kovacic analysis requires rational-function coefficients")
     potential = _normal_form_potential(op)
     finite, infinity_order, infinity_b = _pole_data(potential, x)

@@ -151,9 +151,7 @@ def pole_order(
     return None if valuation is None else max(0, -valuation)
 
 
-def pole_order_upper_bound(
-    expr: sp.Expr, variable: sp.Symbol, point: sp.Expr = 0
-) -> int | None:
+def pole_order_upper_bound(expr: sp.Expr, variable: sp.Symbol, point: sp.Expr = 0) -> int | None:
     """Return a rational upper bound on local pole order."""
     t = sp.Dummy("t")
     try:

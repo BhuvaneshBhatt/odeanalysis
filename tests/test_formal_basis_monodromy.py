@@ -56,12 +56,7 @@ def test_irregular_coalesced_exponential_block_gets_logarithmic_companion():
 
     # Gauge-conjugate Euler theta^2 v = 0 by y = exp(q) v.
     ode = sp.expand(
-        x**2
-        * (
-            sp.diff(y(x), x, 2)
-            - 2 * w * sp.diff(y(x), x)
-            + (w**2 - sp.diff(w, x)) * y(x)
-        )
+        x**2 * (sp.diff(y(x), x, 2) - 2 * w * sp.diff(y(x), x) + (w**2 - sp.diff(w, x)) * y(x))
         + x * (sp.diff(y(x), x) - w * y(x))
     )
 
@@ -92,6 +87,4 @@ def test_airy_ramified_local_monodromy_swaps_exponential_blocks():
     monodromy = formal_monodromy(basis)
     assert monodromy.cover_matrix == -sp.eye(2)
     assert monodromy.local_matrix == sp.Matrix([[0, sp.I], [sp.I, 0]])
-    assert sp.simplify(monodromy.local_matrix**2 - monodromy.cover_matrix) == sp.zeros(
-        2
-    )
+    assert sp.simplify(monodromy.local_matrix**2 - monodromy.cover_matrix) == sp.zeros(2)

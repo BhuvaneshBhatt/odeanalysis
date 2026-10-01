@@ -93,9 +93,7 @@ class CanonicalEquationRecognition:
         canonical_p = canonical.coefficients[1].subs(z, z_of_x)
         canonical_q = canonical.coefficients[0].subs(z, z_of_x)
         expected_p = sp.cancel(z_prime * canonical_p - 2 * h - z_second / z_prime)
-        expected_q = sp.cancel(
-            z_prime**2 * canonical_q - expected_p * h - sp.diff(h, x) - h**2
-        )
+        expected_q = sp.cancel(z_prime**2 * canonical_q - expected_p * h - sp.diff(h, x) - h**2)
         expected = (expected_q, expected_p, sp.S.One)
         return all(
             sp.simplify(sp.cancel(a - b)) == 0
@@ -123,11 +121,7 @@ def _canonical_expression(
         return z**2 * sp.diff(uz, z, 2) + z * sp.diff(uz, z) - (z**2 + nu**2) * uz
     if family is CanonicalEquationFamily.HYPERGEOMETRIC:
         a, b, c = params["a"], params["b"], params["c"]
-        return (
-            z * (1 - z) * sp.diff(uz, z, 2)
-            + (c - (a + b + 1) * z) * sp.diff(uz, z)
-            - a * b * uz
-        )
+        return z * (1 - z) * sp.diff(uz, z, 2) + (c - (a + b + 1) * z) * sp.diff(uz, z) - a * b * uz
     if family is CanonicalEquationFamily.CONFLUENT_HYPERGEOMETRIC:
         a, c = params["a"], params["c"]
         return z * sp.diff(uz, z, 2) + (c - z) * sp.diff(uz, z) - a * uz
@@ -215,11 +209,7 @@ def _recognize_airy(
         return None
     slope = poly.coeff_monomial(x)
     intercept = poly.coeff_monomial(1)
-    scale = (
-        sp.real_root(-slope, 3)
-        if slope.is_real is True
-        else (-slope) ** sp.Rational(1, 3)
-    )
+    scale = sp.real_root(-slope, 3) if slope.is_real is True else (-slope) ** sp.Rational(1, 3)
     if sp.simplify(scale) == 0:
         return None
     shift = sp.simplify(-intercept / scale**2)
@@ -258,11 +248,7 @@ def _bessel_candidate(
         return None
     scale = sp.sqrt(scale_sq)
     nu = sp.sqrt(nu_sq)
-    family = (
-        CanonicalEquationFamily.MODIFIED_BESSEL
-        if modified
-        else CanonicalEquationFamily.BESSEL
-    )
+    family = CanonicalEquationFamily.MODIFIED_BESSEL if modified else CanonicalEquationFamily.BESSEL
     result = _recognition(family, op, scale, sp.simplify(-scale * x0), {"nu": nu})
     return result if result.verify() else None
 
@@ -371,10 +357,7 @@ def _regular_singularity_exponents(
 ) -> tuple[tuple[sp.Expr, tuple[sp.Expr, ...]], ...] | None:
     analysis = analyze_ode_singularities(op, include_infinity=True)
     singularities = list(analysis.finite)
-    if (
-        analysis.infinity is not None
-        and analysis.infinity.kind is not ODESingularityKind.ORDINARY
-    ):
+    if analysis.infinity is not None and analysis.infinity.kind is not ODESingularityKind.ORDINARY:
         singularities.append(analysis.infinity)
     if len(singularities) != 3:
         return None

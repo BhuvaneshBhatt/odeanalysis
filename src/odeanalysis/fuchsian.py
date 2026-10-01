@@ -99,17 +99,13 @@ def _complete_exponents(singularity: ODESingularity) -> tuple[sp.Expr, ...] | No
         return None
     r = sp.Symbol("r")
     try:
-        roots = sp.roots(
-            singularity.indicial_polynomial, r, cubics=False, quartics=False
-        )
+        roots = sp.roots(singularity.indicial_polynomial, r, cubics=False, quartics=False)
     except (NotImplementedError, TypeError, ValueError, sp.PolynomialError):
         roots = {}
     if roots and sum(int(mult) for mult in roots.values()) == singularity.order:
         return tuple(
             root
-            for root, mult in sorted(
-                roots.items(), key=lambda item: sp.default_sort_key(item[0])
-            )
+            for root, mult in sorted(roots.items(), key=lambda item: sp.default_sort_key(item[0]))
             for _ in range(int(mult))
         )
     if len(singularity.indicial_roots) == singularity.order:
@@ -141,9 +137,7 @@ def apparent_singularity_analysis(
         localized = localize_operator(operator, point=sp.oo)
         local = classify_ode_point(localized.operator, point=0, assumptions=assumptions)
     else:
-        local = classify_ode_point(
-            operator, point=requested_point, assumptions=assumptions
-        )
+        local = classify_ode_point(operator, point=requested_point, assumptions=assumptions)
     if local.kind is ODESingularityKind.ORDINARY:
         return ApparentSingularityAnalysis(
             requested_point,
@@ -257,9 +251,7 @@ def apparent_singularity_analysis(
     basis_operator = frobenius.operator if frobenius is not None else operator
     basis_point = frobenius.point if frobenius is not None else requested_point
     try:
-        basis = logarithmic_frobenius_basis(
-            basis_operator, point=basis_point, terms=terms
-        )
+        basis = logarithmic_frobenius_basis(basis_operator, point=basis_point, terms=terms)
     except (FormalBasisError, NotImplementedError, ValueError):
         return ApparentSingularityAnalysis(
             requested_point,
@@ -351,10 +343,7 @@ def riemann_scheme(
         raise ValueError("Riemann schemes require a homogeneous linear equation")
     analysis = analyze_ode_singularities(operator, include_infinity=True)
     singularities = list(analysis.finite)
-    if (
-        analysis.infinity is not None
-        and analysis.infinity.kind is not ODESingularityKind.ORDINARY
-    ):
+    if analysis.infinity is not None and analysis.infinity.kind is not ODESingularityKind.ORDINARY:
         singularities.append(analysis.infinity)
 
     points: list[RiemannSchemePoint] = []
@@ -369,9 +358,7 @@ def riemann_scheme(
             raise NotImplementedError(
                 f"could not resolve the complete indicial data at {singularity.point!s}"
             )
-        apparent = apparent_singularity_analysis(
-            operator, point=singularity.point
-        ).apparent
+        apparent = apparent_singularity_analysis(operator, point=singularity.point).apparent
         points.append(
             RiemannSchemePoint(
                 point=singularity.point,

@@ -78,10 +78,7 @@ class DifferentialNewtonEdge:
         z = symbol or sp.Symbol("lambda")
         return sp.factor(
             sp.expand(
-                sum(
-                    point.leading_coefficient * z**point.derivative_order
-                    for point in self.points
-                )
+                sum(point.leading_coefficient * z**point.derivative_order for point in self.points)
             )
         )
 
@@ -123,9 +120,7 @@ class SlopeFiltration:
         """Return slopes with horizontal multiplicity, in nondecreasing order."""
 
         return tuple(
-            slope
-            for piece in self.pieces
-            for slope in (piece.slope,) * piece.multiplicity
+            slope for piece in self.pieces for slope in (piece.slope,) * piece.multiplicity
         )
 
     @property
@@ -189,10 +184,7 @@ class DifferentialNewtonPolygon:
     @property
     def irregularity(self) -> sp.Rational:
         return sp.simplify(
-            sum(
-                edge.horizontal_length * edge.irregularity_slope
-                for edge in self.irregular_edges
-            )
+            sum(edge.horizontal_length * edge.irregularity_slope for edge in self.irregular_edges)
         )
 
     @property
@@ -243,9 +235,7 @@ def local_order_and_leading_coefficient(
         exponent = sp.sympify(lead.as_powers_dict().get(variable, 0))
         if exponent.is_Rational:
             valuation = sp.Rational(exponent)
-            coefficient = sp.simplify(
-                sp.limit(expression / variable**valuation, variable, 0)
-            )
+            coefficient = sp.simplify(sp.limit(expression / variable**valuation, variable, 0))
             if not coefficient.has(sp.oo, -sp.oo, sp.zoo, sp.nan) and coefficient != 0:
                 return valuation, coefficient
     except SYMBOLIC_FAILURES:
@@ -270,9 +260,7 @@ def local_order_and_leading_coefficient(
             return count
 
         valuation = sp.Rational(multiplicity(pn) - multiplicity(pd))
-        coefficient = sp.simplify(
-            sp.limit(expression / variable**valuation, variable, 0)
-        )
+        coefficient = sp.simplify(sp.limit(expression / variable**valuation, variable, 0))
         if not coefficient.has(sp.oo, -sp.oo, sp.zoo, sp.nan) and coefficient != 0:
             return valuation, coefficient
     except SYMBOLIC_FAILURES:
@@ -337,9 +325,7 @@ def differential_newton_polygon(
                 continue
             if cross.is_positive is True:
                 break
-            raise NotImplementedError(
-                "could not order symbolic Newton-polygon valuations"
-            )
+            raise NotImplementedError("could not order symbolic Newton-polygon valuations")
         hull.append(point_data)
 
     edges: list[DifferentialNewtonEdge] = []
@@ -350,10 +336,8 @@ def differential_newton_polygon(
             for p in points
             if left.derivative_order <= p.derivative_order <= right.derivative_order
             and sp.simplify(
-                (p.height - left.height)
-                * (right.derivative_order - left.derivative_order)
-                - (right.height - left.height)
-                * (p.derivative_order - left.derivative_order)
+                (p.height - left.height) * (right.derivative_order - left.derivative_order)
+                - (right.height - left.height) * (p.derivative_order - left.derivative_order)
             )
             == 0
         )
@@ -379,8 +363,7 @@ def _euler_companion_poincare_rank(
     for derivative_order in range(operator.order):
         coefficient = sp.cancel(
             sp.together(
-                h ** (operator.order - derivative_order)
-                * operator.coefficients[derivative_order]
+                h ** (operator.order - derivative_order) * operator.coefficients[derivative_order]
             )
         )
         if coefficient == 0:
@@ -391,10 +374,7 @@ def _euler_companion_poincare_rank(
 
 
 def slope_filtration(
-    polygon_or_ode: DifferentialNewtonPolygon
-    | sp.Expr
-    | sp.Equality
-    | LinearDifferentialOperator,
+    polygon_or_ode: DifferentialNewtonPolygon | sp.Expr | sp.Equality | LinearDifferentialOperator,
     function: sp.FunctionClass | sp.Expr | None = None,
     variable: sp.Symbol | None = None,
     *,
@@ -411,9 +391,7 @@ def slope_filtration(
     polygon = (
         polygon_or_ode
         if isinstance(polygon_or_ode, DifferentialNewtonPolygon)
-        else differential_newton_polygon(
-            polygon_or_ode, function, variable, point=point
-        )
+        else differential_newton_polygon(polygon_or_ode, function, variable, point=point)
     )
     by_slope: dict[sp.Rational, list[DifferentialNewtonEdge]] = {}
     multiplicities: dict[sp.Rational, int] = {}
@@ -476,10 +454,7 @@ def katz_rank(
 
 
 def poincare_rank(
-    polygon_or_ode: DifferentialNewtonPolygon
-    | sp.Expr
-    | sp.Equality
-    | LinearDifferentialOperator,
+    polygon_or_ode: DifferentialNewtonPolygon | sp.Expr | sp.Equality | LinearDifferentialOperator,
     function: sp.FunctionClass | sp.Expr | None = None,
     variable: sp.Symbol | None = None,
     *,
@@ -494,8 +469,6 @@ def poincare_rank(
     polygon = (
         polygon_or_ode
         if isinstance(polygon_or_ode, DifferentialNewtonPolygon)
-        else differential_newton_polygon(
-            polygon_or_ode, function, variable, point=point
-        )
+        else differential_newton_polygon(polygon_or_ode, function, variable, point=point)
     )
     return _euler_companion_poincare_rank(polygon)

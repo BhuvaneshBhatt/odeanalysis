@@ -121,9 +121,7 @@ def classify_solution_dominance(
     )
     limitation = None
     if not geometry.sector_geometry_complete:
-        limitation = (
-            "symbolic Stokes boundaries or dominance signs could not be ordered exactly"
-        )
+        limitation = "symbolic Stokes boundaries or dominance signs could not be ordered exactly"
     return SolutionDominanceAnalysis(
         point=sp.sympify(point),
         exponential_parts=parts,

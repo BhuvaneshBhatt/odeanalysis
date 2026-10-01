@@ -107,17 +107,13 @@ def _solve_sylvester(
         raise BlockDecompositionError("could not solve the Sylvester equation") from exc
     solutions = list(solution_set)
     if len(solutions) != 1:
-        raise BlockDecompositionError(
-            "Sylvester equation did not have a unique solution"
-        )
+        raise BlockDecompositionError("Sylvester equation did not have a unique solution")
     solution = solutions[0]
     # Parameters from the original coefficient field are allowed.  Detect only
     # linsolve-generated tau symbols by checking whether a solution still
     # contains one of the unknown symbols or a Dummy-like free parameter.
     if any(sp.sympify(item).has(*symbols) for item in solution):
-        raise BlockDecompositionError(
-            "Sylvester equation left unresolved matrix entries"
-        )
+        raise BlockDecompositionError("Sylvester equation left unresolved matrix entries")
     generated = set().union(*(sp.sympify(item).free_symbols for item in solution))
     original = set().union(
         *(entry.free_symbols for entry in list(left) + list(right) + list(target))
@@ -435,13 +431,9 @@ def _recursive_diagonalize(
         )
 
     pivot_power, pivot_coefficient, _ = split_data
-    change, dimensions, eigenvalues, projectors = _generalized_eigenbasis(
-        pivot_coefficient
-    )
+    change, dimensions, eigenvalues, projectors = _generalized_eigenbasis(pivot_coefficient)
     constant_gauge = _constant_series(variable, change)
-    transformed = _formal_gauge_transform(
-        connection, constant_gauge, max_power=max_power
-    )
+    transformed = _formal_gauge_transform(connection, constant_gauge, max_power=max_power)
     transformed, near_identity = _diagonalize_partition(
         transformed,
         dimensions,
@@ -500,9 +492,7 @@ def _recursive_diagonalize(
 
     child_gauge = _block_diag_series(variable, [child.gauge for child in child_results])
     if child_gauge.terms:
-        transformed = _formal_gauge_transform(
-            transformed, child_gauge, max_power=max_power
-        )
+        transformed = _formal_gauge_transform(transformed, child_gauge, max_power=max_power)
         total_gauge = _multiply_gauges(
             stage_gauge,
             child_gauge,
@@ -528,9 +518,7 @@ def _recursive_diagonalize(
         gauge=total_gauge,
         leaf_dimensions=leaf_dimensions,
         splits=splits,
-        moser_steps=tuple(
-            step for child in child_results for step in child.moser_steps
-        ),
+        moser_steps=tuple(step for child in child_results for step in child.moser_steps),
         complete=complete,
         limitation=limitation,
     )
@@ -556,9 +544,7 @@ def ramified_pullback(
     for power, coefficient in connection.terms:
         cover_power = index * power + index - 1
         coefficients[cover_power] = index * sp.Matrix(coefficient)
-    return MatrixLaurentSeries.from_mapping(
-        cover_variable, coefficients, shape=connection.shape
-    )
+    return MatrixLaurentSeries.from_mapping(cover_variable, coefficients, shape=connection.shape)
 
 
 def levelt_turrittin_reduce(
@@ -689,9 +675,7 @@ def formal_block_diagonalize(
         raise ValueError("max_power must include at least the residue order -1")
     result = _recursive_diagonalize(connection, max_power=max_power)
     offsets = _partition_offsets(result.leaf_dimensions)
-    slices = tuple(
-        (offsets[i], offsets[i + 1]) for i in range(len(result.leaf_dimensions))
-    )
+    slices = tuple((offsets[i], offsets[i + 1]) for i in range(len(result.leaf_dimensions)))
     decomposition = FormalBlockDiagonalization(
         original_connection=connection,
         transformed_connection=result.transformed,
@@ -750,9 +734,7 @@ def _expand_matrix_laurent(
                     f"could not Laurent-expand system entry {entry!s}"
                 ) from exc
             expanded[i, j] = sp.expand(truncated)
-    return MatrixLaurentSeries.from_matrix(expanded, variable).truncate(
-        max_power=max_power
-    )
+    return MatrixLaurentSeries.from_matrix(expanded, variable).truncate(max_power=max_power)
 
 
 def _uniformized_q(
@@ -762,9 +744,7 @@ def _uniformized_q(
     ramification: int,
 ) -> sp.Expr:
     q = part.local_exponential_polynomial.subs(part.local_coordinate, local_coordinate)
-    return analytic_powsimp(
-        sp.expand(q.subs(local_coordinate, parameter**ramification))
-    )
+    return analytic_powsimp(sp.expand(q.subs(local_coordinate, parameter**ramification)))
 
 
 def _uniformized_log_derivative_h(
@@ -773,9 +753,7 @@ def _uniformized_log_derivative_h(
     ramification: int,
 ) -> sp.Expr:
     return sp.cancel(
-        sp.together(
-            sp.diff(q_t, parameter) / (ramification * parameter ** (ramification - 1))
-        )
+        sp.together(sp.diff(q_t, parameter) / (ramification * parameter ** (ramification - 1)))
     )
 
 
@@ -812,9 +790,7 @@ def _newton_shearing_exponent(
     return max(pole_orders, default=0)
 
 
-def _shearing_matrix(
-    parameter: sp.Symbol, dimension: int, exponent: int
-) -> sp.ImmutableMatrix:
+def _shearing_matrix(parameter: sp.Symbol, dimension: int, exponent: int) -> sp.ImmutableMatrix:
     if exponent < 0:
         raise ValueError("shearing exponent must be nonnegative")
     return sp.ImmutableMatrix(
@@ -936,13 +912,9 @@ def cyclic_scalar_operator(
         b = sp.Matrix(connection.to_matrix())
     else:
         b = sp.Matrix(connection)
-        symbols = sorted(
-            set().union(*(entry.free_symbols for entry in b)), key=sp.default_sort_key
-        )
+        symbols = sorted(set().union(*(entry.free_symbols for entry in b)), key=sp.default_sort_key)
         if len(symbols) != 1:
-            raise ValueError(
-                "matrix input must involve exactly one independent variable"
-            )
+            raise ValueError("matrix input must involve exactly one independent variable")
         variable = symbols[0]
     if b.rows != b.cols:
         raise ValueError("connection must be square")
@@ -966,9 +938,7 @@ def cyclic_scalar_operator(
     cyclic = sp.Matrix.vstack(*rows[:-1])
     if sp.simplify(cyclic.det()) == 0:
         raise BlockDecompositionError("chosen block output is not a cyclic vector")
-    coefficients = (rows[-1] * cyclic.inv()).applyfunc(
-        lambda entry: sp.cancel(sp.together(entry))
-    )
+    coefficients = (rows[-1] * cyclic.inv()).applyfunc(lambda entry: sp.cancel(sp.together(entry)))
     # u^(m) = sum_j coefficients[j] u^(j).
     operator_coefficients = (
         *tuple(-coefficients[0, j] for j in range(b.rows)),
@@ -1057,9 +1027,7 @@ def exponential_block_decomposition(
     diagonalization = formal_block_diagonalize(connection, max_power=max_power)
 
     formal_gauge_matrix = sp.Matrix(diagonalization.gauge.to_matrix())
-    total_gauge = sp.ImmutableMatrix(
-        (sp.Matrix(shear) * formal_gauge_matrix).applyfunc(sp.expand)
-    )
+    total_gauge = sp.ImmutableMatrix((sp.Matrix(shear) * formal_gauge_matrix).applyfunc(sp.expand))
     output = sp.Matrix(total_gauge)[0:1, :]
     offsets = _partition_offsets(diagonalization.block_dimensions)
     blocks: list[FormalExponentialSystemBlock] = []
@@ -1112,19 +1080,13 @@ def exponential_block_decomposition(
     # block may still need an internal Moser/Levelt reduction; that belongs to
     # the next stage and does not invalidate the exponential splitting itself.
     complete = (
-        metadata_complete
-        and dimension_match
-        and diagonalization.off_block_residual().is_zero
+        metadata_complete and dimension_match and diagonalization.off_block_residual().is_zero
     )
     limitation = None
     if not dimension_match:
-        limitation = (
-            "spectral block dimensions do not match completed Riccati multiplicities"
-        )
+        limitation = "spectral block dimensions do not match completed Riccati multiplicities"
     elif not metadata_complete:
-        limitation = (
-            "could not match every system block to a completed exponential part"
-        )
+        limitation = "could not match every system block to a completed exponential part"
 
     return ExponentialBlockDecomposition(
         point=sp.sympify(point),

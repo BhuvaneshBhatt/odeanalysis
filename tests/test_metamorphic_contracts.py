@@ -19,9 +19,7 @@ def test_nonzero_scalar_multiple_preserves_singularity_kinds(multiplier):
 
     base = analyze_ode_singularities(ode, y, x)
     scaled = analyze_ode_singularities(multiplier * ode, y, x)
-    assert tuple(item.kind for item in scaled.finite) == tuple(
-        item.kind for item in base.finite
-    )
+    assert tuple(item.kind for item in scaled.finite) == tuple(item.kind for item in base.finite)
     assert scaled.infinity.kind is base.infinity.kind
 
 
@@ -44,9 +42,7 @@ def test_reciprocal_coordinate_change_is_consistent_with_infinity_localization()
     operator = LinearDifferentialOperator.from_ode(ode, y, x)
     u = sp.Function("u")
 
-    transformed = change_ode_variable_reciprocal(
-        operator, new_function=u, new_variable=t
-    )
+    transformed = change_ode_variable_reciprocal(operator, new_function=u, new_variable=t)
     infinity = analyze_ode_singularities(operator).infinity
     transformed_origin = analyze_ode_singularities(transformed, u, t).finite[0]
 
@@ -86,9 +82,7 @@ def test_reciprocal_coordinate_change_applied_twice_recovers_operator():
 
     assert all(
         sp.simplify(left - right) == 0
-        for left, right in zip(
-            recovered.coefficients, expected.coefficients, strict=True
-        )
+        for left, right in zip(recovered.coefficients, expected.coefficients, strict=True)
     )
 
 
@@ -101,9 +95,7 @@ def test_riemann_scheme_and_apparentness_ignore_nonzero_scalar_operator_factor()
     b = sp.Rational(1, 2)
     c = sp.Rational(2, 3)
     ode = (
-        x * (1 - x) * sp.diff(y(x), x, 2)
-        + (c - (a + b + 1) * x) * sp.diff(y(x), x)
-        - a * b * y(x)
+        x * (1 - x) * sp.diff(y(x), x, 2) + (c - (a + b + 1) * x) * sp.diff(y(x), x) - a * b * y(x)
     )
     scaled = 7 * ode
     assert riemann_scheme(ode, y, x) == riemann_scheme(scaled, y, x)

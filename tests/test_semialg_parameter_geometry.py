@@ -33,12 +33,8 @@ def test_local_strata_cover_domain_without_freezing_cad_cells():
     coverage = sp.Or(*(stratum.condition for stratum in result.strata))
     assert result.exhaustive
     assert equivalent(coverage, sp.true, (a,))
-    regular = next(
-        s for s in result.strata if s.singularity.kind is ODESingularityKind.REGULAR
-    )
-    irregular = next(
-        s for s in result.strata if s.singularity.kind is ODESingularityKind.IRREGULAR
-    )
+    regular = next(s for s in result.strata if s.singularity.kind is ODESingularityKind.REGULAR)
+    irregular = next(s for s in result.strata if s.singularity.kind is ODESingularityKind.IRREGULAR)
     assert equivalent(regular.condition, sp.Eq(a, 0), (a,))
     assert equivalent(irregular.condition, sp.Ne(a, 0), (a,))
 
@@ -164,9 +160,7 @@ def test_newton_polygon_is_normalization_invariant_not_arbitrary_gauge_invariant
         + x * (sp.diff(u(x), x) + gprime * u(x))
         + u(x)
     )
-    assert _newton_signature(
-        differential_newton_polygon(gauged, u, x)
-    ) != _newton_signature(base)
+    assert _newton_signature(differential_newton_polygon(gauged, u, x)) != _newton_signature(base)
 
 
 def test_stokes_ray_geometry_requires_real_coordinates_and_respects_conjugation_sign():
@@ -181,15 +175,9 @@ def test_stokes_ray_geometry_requires_real_coordinates_and_respects_conjugation_
     else:
         raise AssertionError("unconstrained complex parameter must not be certified")
     ar, ai = sp.symbols("a_r a_i", real=True)
-    original = set(
-        map(str, stokes_ray_loci(((ar + sp.I * ai) * t**2, t**2, 0), t, (ar, ai)))
-    )
-    conjugate = set(
-        map(str, stokes_ray_loci(((ar - sp.I * ai) * t**2, t**2, 0), t, (ar, ai)))
-    )
-    negated = set(
-        map(str, stokes_ray_loci((-(ar + sp.I * ai) * t**2, -(t**2), 0), t, (ar, ai)))
-    )
+    original = set(map(str, stokes_ray_loci(((ar + sp.I * ai) * t**2, t**2, 0), t, (ar, ai))))
+    conjugate = set(map(str, stokes_ray_loci(((ar - sp.I * ai) * t**2, t**2, 0), t, (ar, ai))))
+    negated = set(map(str, stokes_ray_loci((-(ar + sp.I * ai) * t**2, -(t**2), 0), t, (ar, ai))))
     assert original == conjugate
     assert original == negated
 
@@ -214,14 +202,10 @@ def test_multi_point_invariant_constancy_on_representative_certified_regions():
     for region_samples, invariant in zip(samples, expected, strict=True):
         observed = []
         for av, bv in region_samples:
-            degree = sp.Poly(
-                (a * x**3 + b * x**2 + x + 1).subs({a: av, b: bv}), x
-            ).degree()
+            degree = sp.Poly((a * x**3 + b * x**2 + x + 1).subs({a: av, b: bv}), x).degree()
             observed.append((degree, 3 - degree))
         assert all(item == invariant for item in observed)
-    assert {(q.effective_degree, q.infinity_multiplicity) for q in strata} >= set(
-        expected
-    )
+    assert {(q.effective_degree, q.infinity_multiplicity) for q in strata} >= set(expected)
 
     # Newton hull: two points in each zero/nonzero support region.
     newton_ode = x**4 * sp.diff(y(x), x, 2) + a * x * sp.diff(y(x), x) + y(x)
@@ -231,12 +215,8 @@ def test_multi_point_invariant_constancy_on_representative_certified_regions():
             for v in values
         ]
         assert sigs[0] == sigs[1]
-    zero_sig = _newton_signature(
-        differential_newton_polygon(newton_ode.subs(a, 0), y, x)
-    )
-    assert zero_sig != _newton_signature(
-        differential_newton_polygon(newton_ode.subs(a, 1), y, x)
-    )
+    zero_sig = _newton_signature(differential_newton_polygon(newton_ode.subs(a, 0), y, x))
+    assert zero_sig != _newton_signature(differential_newton_polygon(newton_ode.subs(a, 1), y, x))
 
     # Rank: rank is constant at multiple points of each representative rank cell.
     matrices = [sp.Matrix([[1, 0, 0], [0, v, 0], [0, 0, 0]]) for v in (1, 2, -3)]

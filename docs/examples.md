@@ -62,7 +62,7 @@ from odeanalysis import (
 )
 
 x = sp.symbols("x")
-system = FirstOrderSystem(x, sp.ImmutableMatrix([[1/x**2, 0], [0, -1/x**2]]))
+system = FirstOrderSystem(x, sp.ImmutableMatrix([[1 / x**2, 0], [0, -1 / x**2]]))
 local = analyze_system_singularity(system, 0)
 assert local.kind == "irregular"
 assert local.poincare_rank == 1
@@ -73,7 +73,7 @@ stokes = system_stokes_geometry(formal)
 assert stokes.structural_only
 
 a = sp.symbols("a", real=True)
-family = FirstOrderSystem(x, sp.ImmutableMatrix([[a/x, 0], [0, -a/x]]))
+family = FirstOrderSystem(x, sp.ImmutableMatrix([[a / x, 0], [0, -a / x]]))
 parameter_data = system_parameter_analysis(family, (a,), max_resonance_order=2)
 assert parameter_data.exhaustive
 assert parameter_data.rank_loci and parameter_data.resonance_loci
@@ -121,11 +121,7 @@ from odeanalysis import riemann_scheme
 x = sp.symbols("x")
 y = sp.Function("y")
 a, b, c = sp.Rational(1, 3), sp.Rational(1, 2), sp.Rational(2, 3)
-ode = (
-    x * (1 - x) * sp.diff(y(x), x, 2)
-    + (c - (a + b + 1) * x) * sp.diff(y(x), x)
-    - a * b * y(x)
-)
+ode = x * (1 - x) * sp.diff(y(x), x, 2) + (c - (a + b + 1) * x) * sp.diff(y(x), x) - a * b * y(x)
 scheme = riemann_scheme(ode, y, x)
 
 assert scheme.points == (0, 1, sp.oo)
@@ -182,8 +178,9 @@ For a generic simple turning point such as `Q=x*(1+x)`, the Airy coordinate stil
 ```python
 import sympy as sp
 from odeanalysis import FirstOrderSystem, analyze_system_singularity, formal_system_analysis
+
 x = sp.symbols("x")
-S = FirstOrderSystem(x, sp.ImmutableMatrix([[0, 1/x], [0, 2/x]]))
+S = FirstOrderSystem(x, sp.ImmutableMatrix([[0, 1 / x], [0, 2 / x]]))
 local = analyze_system_singularity(S, 0)
 assert local.regular_singular and local.exponents == (0, 2)
 assert local.resonances
@@ -197,7 +194,8 @@ This separates residue resonance from the stronger question of whether logarithm
 
 ```python
 from odeanalysis import system_stokes_geometry
-S = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -x**-2))
+
+S = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
 formal = formal_system_analysis(S, 0)
 geometry = system_stokes_geometry(formal)
 assert formal.complete
@@ -211,7 +209,7 @@ The pairwise exponential difference determines rays; no analytic Stokes multipli
 
 ```python
 G = sp.ImmutableMatrix([[1, 1], [0, 1]])
-D = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -x**-2))
+D = FirstOrderSystem(x, sp.ImmutableMatrix.diag(x**-2, -(x**-2)))
 S = D.gauge_transform(G)
 formal = formal_system_analysis(S, 0, adaptive=True)
 assert formal.certificate.verified
@@ -225,7 +223,11 @@ A constant gauge hides the diagonal presentation without changing the formal spe
 ```python
 S = FirstOrderSystem(x, sp.ImmutableMatrix([[0, x**-2], [x**-3, 0]]))
 formal = formal_system_analysis(
-    S, 0, adaptive=True, max_depth=1, max_adaptive_depth=6,
+    S,
+    0,
+    adaptive=True,
+    max_depth=1,
+    max_adaptive_depth=6,
     max_adaptive_cover_index=12,
 )
 assert formal.certificate.verified
@@ -238,8 +240,9 @@ If the configured cover/depth budget is insufficient, `complete` remains false a
 
 ```python
 from odeanalysis import LinearDifferentialOperator, scalar_system_correspondence
+
 y = sp.Function("y")
-op = LinearDifferentialOperator(x, y, (x, 1+x, 1))
+op = LinearDifferentialOperator(x, y, (x, 1 + x, 1))
 correspondence = scalar_system_correspondence(op)
 assert correspondence.verify()
 ```
@@ -250,12 +253,13 @@ Scalar algorithms remain specialized; the correspondence is an explicit testable
 
 ```python
 from odeanalysis import system_formal_type_stratification, parameterized_turning_analysis
+
 a = sp.symbols("a", real=True)
-S = FirstOrderSystem(x, sp.ImmutableMatrix([[a/x, 0], [0, -a/x]]))
+S = FirstOrderSystem(x, sp.ImmutableMatrix([[a / x, 0], [0, -a / x]]))
 types = system_formal_type_stratification(S, (a,), max_resonance_order=2)
 assert types.base.exhaustive
 
-op = LinearDifferentialOperator(x, y, (-(x**2-a), 0, 1))
+op = LinearDifferentialOperator(x, y, (-(x**2 - a), 0, 1))
 turning = parameterized_turning_analysis(op, parameters=(a,))
 assert turning.exhaustive and turning.transition_polynomials
 ```
@@ -266,6 +270,7 @@ The first decomposition tracks spectral/resonance/formal information; the second
 
 ```python
 from odeanalysis import certified_system_continuation
+
 S = FirstOrderSystem(x, sp.ImmutableMatrix.diag(1, -1))
 transport = certified_system_continuation(S, 0, 1)
 if transport.complete:

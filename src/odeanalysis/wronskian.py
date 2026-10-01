@@ -44,9 +44,7 @@ def abel_wronskian(
     return c * sp.exp(-sp.Integral(a_nm1, x))
 
 
-def _nonzero_witness(
-    expr: sp.Expr, variable: sp.Symbol, assumptions: sp.Expr
-) -> sp.Expr | None:
+def _nonzero_witness(expr: sp.Expr, variable: sp.Symbol, assumptions: sp.Expr) -> sp.Expr | None:
     """Find a cheap exact point witnessing a nonzero expression."""
     for point in (sp.S.Zero, sp.S.One, -sp.S.One, sp.Integer(2)):
         try:

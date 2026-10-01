@@ -41,9 +41,7 @@ class MatrixLaurentSeries:
                 raise TypeError("Laurent powers must be integers")
             matrix = sp.Matrix(coefficient)
             if matrix.shape != (self.rows, self.cols):
-                raise ValueError(
-                    "all Laurent coefficient matrices must have the declared shape"
-                )
+                raise ValueError("all Laurent coefficient matrices must have the declared shape")
             if matrix.is_zero_matrix:
                 continue
             if power in combined:
@@ -215,9 +213,7 @@ class MatrixLaurentSeries:
     ) -> MatrixLaurentSeries:
         self._check_same_variable(other)
         if self.shape != other.shape:
-            raise ValueError(
-                "matrix Laurent series have incompatible shapes for addition"
-            )
+            raise ValueError("matrix Laurent series have incompatible shapes for addition")
         coefficients: dict[int, sp.Matrix] = {
             power: sp.Matrix(coefficient) for power, coefficient in self.terms
         }
@@ -240,9 +236,7 @@ class MatrixLaurentSeries:
     ) -> MatrixLaurentSeries:
         self._check_same_variable(other)
         if self.cols != other.rows:
-            raise ValueError(
-                "matrix Laurent series have incompatible shapes for multiplication"
-            )
+            raise ValueError("matrix Laurent series have incompatible shapes for multiplication")
         coefficients: dict[int, sp.Matrix] = {}
         for left_power, left_coefficient in self.terms:
             for right_power, right_coefficient in other.terms:
@@ -318,9 +312,7 @@ class MatrixLaurentSeries:
         if max_power < inverse_lead_power:
             return self.zero(self.variable, self.rows, self.cols)
 
-        coefficients = {
-            power - lead_power: sp.Matrix(matrix) for power, matrix in self.terms
-        }
+        coefficients = {power - lead_power: sp.Matrix(matrix) for power, matrix in self.terms}
         a0 = coefficients[0]
         try:
             b0 = a0.inv()
@@ -352,6 +344,4 @@ class MatrixLaurentSeries:
 
     def _check_same_variable(self, other: MatrixLaurentSeries) -> None:
         if self.variable != other.variable:
-            raise ValueError(
-                "matrix Laurent series use different uniformizing variables"
-            )
+            raise ValueError("matrix Laurent series use different uniformizing variables")
