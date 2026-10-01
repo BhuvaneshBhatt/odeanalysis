@@ -34,6 +34,9 @@ asymptotic = ["asymptotic>=0.2.0"]
 certified = ["python-flint>=0.9.0"]
 dev = ["build>=1.2", "ruff>=0.16", "twine>=6"]
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
@@ -46,8 +49,14 @@ addopts = "-q -p no:ddtrace"
 
 [tool.ruff]
 target-version = "py311"
-line-length = 88
-extend-exclude = ["dist", "build"]
+line-length = 100
+exclude = [
+    "notebooks",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I", "B", "UP", "RUF"]
