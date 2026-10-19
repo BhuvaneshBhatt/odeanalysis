@@ -31,7 +31,7 @@ Issues = "https://github.com/BhuvaneshBhatt/odeanalysis/issues"
 [project.optional-dependencies]
 test = ["pytest>=8", "hypothesis>=6"]
 asymptotic = ["asymptotic>=0.2.0"]
-certified = ["python-flint>=0.9.0"]
+certified = ["python-flint>=0.9.0", "exprtools>=0.1.0"]
 dev = ["build>=1.2", "ruff>=0.16", "twine>=6"]
 
 [tool.setuptools]
