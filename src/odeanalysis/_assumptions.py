@@ -6,16 +6,19 @@ import sympy as sp
 from funcprops import entails, normalize_assumptions
 
 try:
-    from exprtest import zerotest as _exprtest_zerotest
-except ImportError:  # Optional stronger oracle; funcprops remains sufficient.
-    _exprtest_zerotest = None
+    from exprtools import zerotest as _exprtools_zerotest
+except ImportError:
+    try:  # Compatibility with environments predating exprtools.
+        from exprtest import zerotest as _exprtools_zerotest
+    except ImportError:  # Optional stronger oracle; funcprops remains sufficient.
+        _exprtools_zerotest = None
 
 
 def zero_status(expr: sp.Expr, assumptions: sp.Expr | bool = True) -> bool | None:
     """Prove zero/nonzero when cheap, returning ``None`` when unresolved.
 
     Fast structural and SymPy assumption checks run first.  ``funcprops`` handles
-    bounded logical entailment.  If installed, ``exprtest`` is used last and
+    bounded logical entailment.  If installed, ``exprtools`` is used last and
     only with ``confidence='certified'`` so heuristic nonzero evidence can never
     steer an ODE classification branch.
     """
@@ -37,14 +40,14 @@ def zero_status(expr: sp.Expr, assumptions: sp.Expr | bool = True) -> bool | Non
             decision = None
         if decision is not None:
             return decision
-    use_exprtest = _exprtest_zerotest is not None and not simplified.has(
+    use_exprtools = _exprtools_zerotest is not None and not simplified.has(
         sp.nan, sp.zoo, sp.oo, -sp.oo
     )
     if simplified.free_symbols and simplified.is_rational_function(*simplified.free_symbols):
-        use_exprtest = False
-    if use_exprtest:
+        use_exprtools = False
+    if use_exprtools:
         try:
-            return _exprtest_zerotest(simplified, assumptions=assumptions, confidence="certified")
+            return _exprtools_zerotest(simplified, assumptions=assumptions, confidence="certified")
         except (RecursionError, TypeError, ValueError):
             return None
     return None

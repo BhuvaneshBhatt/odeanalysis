@@ -21,6 +21,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+      - name: Install exprtools pending first release
+        run: python -m pip install "exprtools @ git+https://github.com/BhuvaneshBhatt/exprtest.git@b6c38bd2b5fc27d8f88e30026d52868050308e18#subdirectory=exprtools"
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e '.[test,dev]'
       - run: ruff check .
